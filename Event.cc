@@ -2,6 +2,7 @@
 #include "Window.h"
 //-----------------------------------------------------------------------------
 EventControl *EventControl::active = NULL;
+vector<EventControl *> EventControl::active_list;
 //-----------------------------------------------------------------------------
 EventControl *EventControl::Find( Window w )
 {
@@ -13,9 +14,13 @@ EventControl *EventControl::Find( Window w )
 //----------------------------------------------------------------------------
 void EventControl::Grab( Window w, EventControl *a )
 {
+	if( active == a ) return;
 //	XGrabKeyboard(display, w, True,	GrabModeAsync, GrabModeAsync, CurrentTime);
 	int x = XGrabPointer(display, w, True, ButtonPressMask|ButtonReleaseMask,
 			GrabModeAsync, GrabModeAsync, None, None, CurrentTime);
+	// TODO:
+	// MUST check x here
+	active_list.push_back( active );
 	active = a;
 }
 //----------------------------------------------------------------------------
@@ -23,7 +28,8 @@ void EventControl::Release()
 {
 	XUngrabPointer(display, CurrentTime);
 	XUngrabKeyboard(display, CurrentTime);
-	active = NULL;
+	active = active_list[ active_list.size() - 1 ];
+	active_list.erase( active_list.begin() + active_list.size() - 1 );
 }
 //----------------------------------------------------------------------------
 void EventControl::ProcessEvent( XEvent *e )

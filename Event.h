@@ -6,6 +6,7 @@
 class EventControl: public Resource {
 private:
 	static EventControl *active;
+	static vector<EventControl *> active_list;
 
 	long btime, ktime;
 public:
