@@ -131,7 +131,8 @@ void Background::ScanSource( char *s )
 		struct dirent **files;
 		int p, n = scandir( path.c_str(), &files, 0, 0 );
 		path += "/";
-		for( int i=0; i<n; i++, free( files[i] ) ) {
+
+		for( int i=0; i<n; free( files[i] ), i++ ) {
 			string f = path + files[i]->d_name;
 			if( stat( f.c_str(), &b ) < 0 ) continue;
 			if( S_ISDIR( b.st_mode ) ) {
