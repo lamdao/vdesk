@@ -4,23 +4,29 @@
 #include <dirent.h>
 #include "Background.h"
 //----------------------------------------------------------------------------
+#define CLEANER_TIMEOUT		10
+//----------------------------------------------------------------------------
 int VDESK_DELAY = 0;
 //----------------------------------------------------------------------------
 Background::Background( char *s, char *m, int d ): TimerControl(), Resource(),
-						save(NULL), show(NULL), SpareRoot(NULL),
+						save(NULL), show(NULL),
+						SpareRoot(NULL), RootPixmap(None),
 						delay(0), mode(0), refreshable(false),
 						source(NULL), srctime(0), images(""),
-						controls(NULL), command(0)
+						controls(NULL), command(0),
+						cleaner(&SpareRoot)
 {
 	Init();
 	ScanSource( source = strdup( s ) );
 	SetDelay( d );
 	ChangeImage();
+	Timer::Add( &cleaner, CLEANER_TIMEOUT );
 }
 //----------------------------------------------------------------------------
 Background::~Background()
 {
 	if( SpareRoot ) Imlib_kill_image( ScreenData, SpareRoot );
+	if( RootPixmap != None ) Imlib_free_pixmap( ScreenData, RootPixmap );
 	FreeData();
 }
 //----------------------------------------------------------------------------
@@ -108,13 +114,40 @@ void Background::Refresh()
 					ScreenData, Root, 0, 0, 0, ScreenWidth, ScreenHeight );
 }
 //----------------------------------------------------------------------------
+void Background::RenderBackground( ImlibImage *si, bool apply )
+{
+	Imlib_render( ScreenData, si, ScreenWidth, ScreenHeight );
+	Pixmap p = Imlib_copy_image( ScreenData, si );
+	SpareRoot = Imlib_create_image_from_drawable( ScreenData, p, 0,
+					0, 0, ScreenWidth, ScreenHeight );
+	Imlib_kill_image( ScreenData, si );
+	if( !apply )
+		Imlib_free_pixmap( ScreenData, p );
+	else {
+		Imlib_apply_image( ScreenData, SpareRoot, Root );
+		SetRootAtoms( p );
+	}
+}
+//----------------------------------------------------------------------------
 ImlibImage *Background::Crop( int x, int y, int w, int h )
 {
+	ImlibImage *si = NULL, *s = NULL;
+
 	if( !SpareRoot ) {
-		cerr << "Erh???????" << endl;
-		cerr << endl << endl << endl;
+		if( !current ) {
+			cerr << "[vdesk] Eh??? No SpareRoot???" << endl;
+			cerr << endl << endl << endl;
+			exit(0);
+		}
+		RenderBackground( s = Imlib_load_image( ScreenData, current ), false );
 	}
-	return Imlib_crop_and_clone_image( ScreenData, SpareRoot, x, y, w, h );
+
+	si = Imlib_crop_and_clone_image( ScreenData, SpareRoot, x, y, w, h );
+	if( s )
+		Timer::Add( &cleaner, CLEANER_TIMEOUT );
+	else
+		cleaner.Reset();
+	return si;
 }
 //----------------------------------------------------------------------------
 void Background::ScanSource( char *s )
@@ -127,6 +160,12 @@ void Background::ScanSource( char *s )
 
 	if( stat( path.c_str(), &b ) < 0 ) {
 		cerr << "[vdesk] Background's source not found." << endl;
+		if( show->size() + save->size() < 1 ) {
+			// TODO:
+			// Create a default vdesk bacground here
+			// and don't remove it from timer list
+			Timer::Remove( this );
+		}
 		return;
 	}
 
@@ -145,7 +184,7 @@ void Background::ScanSource( char *s )
 		n = scandir( path.c_str(), &files, 0, 0 );
 		path += "/";
 
-		for( int i=0; i<n; free( files[i] ), i++ ) {
+		for( int i = 0; i < n; free( files[i] ), i++ ) {
 			string f = path + files[i]->d_name;
 			if( stat( f.c_str(), &b ) < 0 ) continue;
 			if( S_ISDIR( b.st_mode ) ) {
@@ -160,6 +199,7 @@ void Background::ScanSource( char *s )
 			images += "|" + f + "|";
 			show->push_back( strdup( f.c_str() ) );
 		}
+		free( files );
 	}
 }
 //----------------------------------------------------------------------------
@@ -173,6 +213,10 @@ void Background::OnTime()
 {
 	ChangeImage();
 	if( controls ) controls->Perform( command );
+	if( SpareRoot ) {
+		Imlib_kill_image( ScreenData, SpareRoot );
+		SpareRoot = NULL;
+	}
 }
 //----------------------------------------------------------------------------
 void Background::ChangeImage()
@@ -190,21 +234,21 @@ void Background::ChangeImage()
 	if( show->size() > 0 ) {
 		string sf;
 		while( true ) {
-			char *f;
 			int c = (int)((float)(show->size()-1) * rand() / (RAND_MAX+1.0));
-			si = Imlib_load_image( ScreenData, f = (*show)[c] );
+			si = Imlib_load_image( ScreenData, current = (*show)[c] );
 			if( VDESK_DELAY )
-				cerr << "[" << c << "/" << show->size() << "]" << f << endl;
+				cerr << "[" << c << "/" << show->size() << "]"
+					 << current << endl;
 			show->erase( show->begin() + c );
 			if( si ) {
-				save->push_back( f );
+				save->push_back( current );
 				break;
 			}
 
-			sf = string("|") + f + "|";
+			sf = string("|") + current + "|";
 			c = images.find( sf.c_str() );
 			if( c >= 0 ) images.erase( c, sf.length() );
-			free( f );
+			free( current );
 
 			if( !show->size() )
 				SwapData();
@@ -225,12 +269,57 @@ void Background::ChangeImage()
 		return;
 	}
 
-	Imlib_render( ScreenData, si, ScreenWidth, ScreenHeight );
-	Pixmap p = Imlib_copy_image( ScreenData, si );
-	SpareRoot = Imlib_create_image_from_drawable( ScreenData, p, 0,
-					0, 0, ScreenWidth, ScreenHeight );
-	Imlib_apply_image( ScreenData, SpareRoot, Root );
-	Imlib_free_pixmap( ScreenData, p );
-	Imlib_kill_image( ScreenData, si );
+	RenderBackground( si );
+}
+//----------------------------------------------------------------------------
+// This routine was stolen from bsetroot.cc of fluxbox ;-)
+// But don't know why it makes xchat crash all the times :-))
+//----------------------------------------------------------------------------
+void Background::SetRootAtoms(Pixmap p)
+{
+	Atom atom_root, atom_eroot, type;
+	unsigned char *data_root, *data_eroot;
+	unsigned long length, after;
+	int format;
+
+	atom_root = XInternAtom(display, "_XROOTMAP_ID", true);
+	atom_eroot = XInternAtom(display, "ESETROOT_PMAP_ID", true);
+
+	// doing this to clean up after old background
+	if( atom_root != None && atom_eroot != None ) {
+		XGetWindowProperty(display, Root,
+				atom_root, 0L, 1L, false, AnyPropertyType,
+				&type, &format, &length, &after, &data_root);
+
+		if( type == XA_PIXMAP ) {
+			XGetWindowProperty(display, Root,
+					atom_eroot, 0L, 1L, False, AnyPropertyType,
+					&type, &format, &length, &after, &data_eroot);
+
+			if( data_root && data_eroot && type == XA_PIXMAP &&
+				*((Pixmap *) data_root) == *((Pixmap *) data_eroot) ) {
+				XKillClient(display, *((Pixmap *) data_root));
+			}
+		}
+	}
+
+	atom_root = XInternAtom(display, "_XROOTPMAP_ID", false);
+	atom_eroot = XInternAtom(display, "ESETROOT_PMAP_ID", false);
+
+	if( atom_root == None || atom_eroot == None ) {
+		cerr << "couldn't create pixmap atoms, giving up!" << endl;
+		return;
+	}
+
+	// setting new background atoms
+	XChangeProperty(display, Root, atom_root, XA_PIXMAP, 32, PropModeReplace,
+			(unsigned char *) &p, 1);
+	XChangeProperty(display, Root, atom_eroot, XA_PIXMAP, 32, PropModeReplace,
+			(unsigned char *) &p, 1);
+
+	// release old root's pixmap & update new one
+	if( RootPixmap != None )
+		Imlib_free_pixmap( ScreenData, RootPixmap );
+	RootPixmap = p;
 }
 //----------------------------------------------------------------------------

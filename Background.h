@@ -5,16 +5,53 @@
 #include "Timer.h"
 //----------------------------------------------------------------------------
 class Background: public Resource, public TimerControl {
+	class Cleaner: public TimerControl {
+	private:
+		ImlibImage **root;
+	public:
+		Cleaner( ImlibImage **r ): root( r ) {}
+		void OnTime() {
+			Imlib_kill_image( ScreenData, *root );
+			*root = NULL;
+		}
+	};
+	class Pattern {
+	private:
+		Pixmap pixmap;
+	public:
+		Pattern(): pixmap(None) {}
+		virtual void Render() = 0;
+	};
+
+	class SolidPattern: public Pattern {
+	public:
+		SolidPattern();
+		void Render();
+	};
+
+	class ModulaPattern: public Pattern {
+	public:
+		ModulaPattern();
+		void Render();
+	};
+
+	class GradientPattern: public Pattern {
+	public:
+		GradientPattern();
+		void Render();
+	};
 private:
 	vector<char*> data[2];
 	vector<char*> *save, *show;
+	Pixmap RootPixmap;
 	ImlibImage *SpareRoot;
 	int delay, mode;
 	bool refreshable;
-	char *source;
+	char *source, *current;
 	time_t srctime;
 	string images;
 
+	Cleaner cleaner;
 	ActionControl *controls;
 	int command;
 
@@ -39,6 +76,8 @@ private:
 	void FreeData();
 	void SwapData();
 	void ScanSource( char *s );
+	void SetRootAtoms( Pixmap p );
+	void RenderBackground( ImlibImage *si, bool apply = true );
 	void ChangeImage();
 };
 //----------------------------------------------------------------------------
