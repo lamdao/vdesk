@@ -75,6 +75,13 @@ else
 	xft_lib=`pkg-config --libs xft 2>/dev/null`
 fi
 
+echo -n "Checking Xft... "
+if [ "$xft_inc" != "" -a "$xft_lib" != "" ]; then
+	echo yes
+else
+	echo no
+fi
+
 echo -n "Checking Imlib... "
 if [ $have_pkgcfg = 1 ]; then
 	imlib_inc=`pkg-config --cflags imlib 2>/dev/null`
@@ -107,6 +114,7 @@ echo "EXT_LIB=$ext_lib" >> Makefile.cfg
 echo "PREFIX=$prefix" >> Makefile.cfg
 echo "USE_MB_TEXT=$use_mbtext" >> Makefile.cfg
 
+echo
 echo "Config:"
 echo "  Prefix: $prefix"
 echo "  Xft include: $xft_inc"
@@ -117,6 +125,7 @@ echo "  Extra include: $ext_inc"
 echo "  Extra lib: $ext_lib"
 echo
 echo "Type \"make\" to start building vdesk"
+echo
 
 sys=`uname -s | tr [A-Z] [a-z] | sed -e "s/.*bsd.*/bsd/"`
 ln -sf Makefile.$sys Makefile

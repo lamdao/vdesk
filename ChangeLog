@@ -1,4 +1,6 @@
 * 0.0.92:
+	- Add shadow for menu & dialogs
+	- Add adaptive text color
 	- Allow edit link
 	- Allow using <Tab> to switch to other control in Linke Editor,
 	using <Esc> to close, using <Spacebar> & <Enter> with Buttons
@@ -11,7 +13,7 @@
 	- Fixed some bugs
 	- Add default icon/icon path
 
-* 0.0.90: (Initial release)
+* 0.0.90: (Initial release - alpha)
 	- Rewrite all idesk's components
 	- Add link editor dialog
 	- Add popup menu for icon
