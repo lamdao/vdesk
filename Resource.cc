@@ -33,6 +33,7 @@ XftFont *Resource::Font;
 Color Resource::FColor;
 Color Resource::BColor;
 Color Resource::SColor;
+Color Resource::RColor;
 Color Resource::CForeground;
 Color Resource::CBackground;
 Color Resource::CBarText;
@@ -219,17 +220,16 @@ void Resource::LoadColor()
 {
 	FColor.Set( Config->QueryAsStr( "FontColor" ) );
 	SColor.Set( Config->QueryAsStr( "ShadowColor", "black" ) );
+	RColor.Copy( SColor, true );
 
-	if( HighContrast )
-		BColor.Set( 65535, (XftColor *)FColor );
-	else
 	if( HighContrastValue[ 0 ] == '#' ) {
 		BColor.Set( HighContrastValue );
 		HighContrast = true;
 	}
-
-	if( HighContrast )
-		BColor.SetAlpha( 21845 );
+	else {
+		BColor.Set( 65535, (XftColor *)FColor );
+	}
+	BColor.SetAlpha( 21845 );
 
 	CForeground.Set( Config->QueryAsStr( "Control.Foreground", "black" ) );
 	CBackground.Set( Config->QueryAsStr( "Control.Background", "white" ) );

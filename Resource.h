@@ -59,6 +59,7 @@ protected:
 	static Color FColor;
 	static Color BColor;
 	static Color SColor;
+	static Color RColor;
 	static Color CForeground;
 	static Color CBackground;
 	static Color CBarText;
