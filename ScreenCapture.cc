@@ -119,7 +119,8 @@ void ScreenCapture::Perform( int id )
 //----------------------------------------------------------------------------
 void *ScreenCapture::Save(void *v)
 {
-	Imlib_save_image( ScreenData, shot,	(char *)v, NULL );
+	sleep(3);
+	if( v ) Imlib_save_image( ScreenData, shot, (char *)v, NULL );
 	Imlib_kill_image( ScreenData, shot );
 	shot = NULL;
 	return 0;
@@ -127,21 +128,19 @@ void *ScreenCapture::Save(void *v)
 //----------------------------------------------------------------------------
 void ScreenCapture::OnTime()
 {
-	while( shot != NULL );
+	while( shot != NULL ) sleep(1);
 	shot = Imlib_create_image_from_drawable( ScreenData, Root, 0,
 				0, 0, ScreenWidth, ScreenHeight );
 	Imlib_apply_image( ScreenData, shot, sample->Handler() );
 
+	thread_t t;
 	string s = save_folder + "screenshot.png";
 	name->SetText( s.c_str() );
 
 	Show();
-	if( !Accepted() ) {
-		Imlib_kill_image( ScreenData, shot );
-		shot = NULL;
-	}
+	if( !Accepted() )
+		thr_create(0, 0, Save, NULL, 0, &t);
 	else {
-		thread_t t;
 		char *d = (char *)name->GetText().c_str();
 		thr_create(0, 0, Save, d, 0, &t);
 
@@ -150,14 +149,17 @@ void ScreenCapture::OnTime()
 		save_folder += "/";
 		free( d );
 	}
+	thr_detach(t);
 }
 //----------------------------------------------------------------------------
 void ScreenCapture::Activate( int x, int y )
 {
 	if( x < 0 ) x = 0;
+	else
 	if( x + width >= ScreenWidth )
 		x = ScreenWidth - width - 1;
 	if( y < 0 ) y = 0;
+	else
 	if( y + height >= ScreenHeight )
 		y = ScreenHeight - height - 1;
 	MoveTo( x, y );
