@@ -3,8 +3,9 @@
 //----------------------------------------------------------------------------
 #include "Dialog.h"
 #include "Editor.h"
+#include "Timer.h"
 //----------------------------------------------------------------------------
-class ScreenCapture: public Dialog {
+class ScreenCapture: public Dialog, public TimerControl {
 private:
 	WinControl *sample;
 	Editor *name;
@@ -13,6 +14,9 @@ private:
 	Button *cancel;
 
 	string save_folder;
+
+	static ImlibImage *shot;
+
 public:
 	ScreenCapture();
 	~ScreenCapture();
@@ -21,8 +25,13 @@ public:
 	virtual void Perform( int id );
 
 	void Activate( int x, int y );
+
+	virtual void OnTime();
 protected:
 	virtual void Draw();
+
+private:
+	static void *Save(void *);
 };
 //----------------------------------------------------------------------------
 #endif
