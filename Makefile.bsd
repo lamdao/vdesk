@@ -1,5 +1,6 @@
 CXX   = g++
 VDESK = vdesk
+THREAD_LIB = -lpthread
 .if exists(Makefile.cfg)
 include Makefile.cfg
 .if exists(Makefile.dep)
