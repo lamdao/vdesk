@@ -6,7 +6,7 @@ include Makefile.cfg
 do-it-all: $(VDESK)
 include Makefile.dep
 .else
-do-it-all: dep
+do-it-all: dep $(VDESK)
 .endif
 .else
 do-it-all: config
