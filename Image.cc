@@ -100,12 +100,12 @@ void Image::Draw()
 	if( broken ) {
 		int sx = (width - BrokenIcon->rgb_width) / 2,
 			sy = height - 1,
-			ss[] = {2,1,0,0,0,0,0,0,0,0,0,0,1,2};
+			ss[] = {3,2,1,1,1,1,1,1,1,1,1,1,2,3};
 
 		for( i = BrokenIcon->rgb_height - 2; i > 0; i--, sy-- ) {
 			uchar *d = &bgrgb[3 * (sy * width + sx + ss[i-1])];
 			uchar *s = &BrokenIcon->rgb_data[3 * (i * BrokenIcon->rgb_width + ss[i-1])];
-			for( j = 3 * (BrokenIcon->rgb_width - 2*ss[i-1]); j > 0; j-- )
+			for( j = 3 * (BrokenIcon->rgb_width - 2 * ss[i-1]); j > 0; j-- )
 				*d++ = *s++;
 		}
 	}
