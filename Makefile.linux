@@ -1,5 +1,6 @@
 CXX   = g++
 VDESK = vdesk
+THREAD_LIB = -lpthread
 ifeq (Makefile.cfg,$(wildcard Makefile.cfg))
 include Makefile.cfg
 ifeq (Makefile.dep,$(wildcard Makefile.dep))
