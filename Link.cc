@@ -211,6 +211,26 @@ void Link::SetPosition( int x, int y )
 	Icon->MoveTo( x, y );
 }
 //-----------------------------------------------------------------------------
+inline bool IsExecutable( const char *f, struct stat &b, int MyUID, int MyGID )
+{
+	static char slink[4096];
+
+	if( S_ISLNK( b.st_mode ) ) {
+		int n = readlink(f, slink, sizeof(slink));
+		if( n < 0 ) return false;
+		slink[n] = 0;
+		if( stat( slink, &b ) < 0 )
+			return false;
+	}
+
+	if( !S_ISREG( b.st_mode ) )
+		return false;
+	
+	return ((b.st_mode & S_IXOTH) ||
+			(b.st_uid == MyUID && (b.st_mode & S_IXUSR)) ||
+			(b.st_gid == MyGID && (b.st_mode & S_IXUSR)));
+}
+//-----------------------------------------------------------------------------
 void Link::Check()
 {
 	executable = false;
@@ -224,23 +244,17 @@ void Link::Check()
 			p = strtok( NULL, " " );
 		}
 		if( !p ) goto __free_string;
-		if( strrchr( p, '/' ) && stat( p, &b ) >= 0 && S_ISREG( b.st_mode ) ) {
-			if( (b.st_mode & S_IXOTH) ||
-				(b.st_uid == MyUID && (b.st_mode & S_IXUSR)) ||
-				(b.st_gid == MyGID && (b.st_mode & S_IXGRP)) )
-				executable = true;
-		}
+
+		if( strrchr( p, '/' ) && stat( p, &b ) >= 0 &&
+			IsExecutable( p, b, MyUID, MyGID ) )
+			executable = true;
 		else
 		for( int i=0; i<SystemPath.size(); i++ ) {
 			string cmd = string(SystemPath[i]) + "/" + p;
-			if( stat( cmd.c_str(), &b ) >= 0 ) {
-				if( !S_ISREG( b.st_mode ) ) continue;
-				if( (b.st_mode & S_IXOTH) ||
-					(b.st_uid == MyUID && (b.st_mode & S_IXUSR)) ||
-					(b.st_gid == MyGID && (b.st_mode & S_IXGRP)) ) {
-					executable = true;
-					break;
-				}
+			if( stat( cmd.c_str(), &b ) >= 0 &&
+				IsExecutable( cmd.c_str(), b, MyUID, MyGID ) ) {
+				executable = true;
+				break;
 			}
 		}
 	__free_string:
