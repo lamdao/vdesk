@@ -1,13 +1,44 @@
 #!/bin/sh
 
-case "$1" in
-	--prefix=*)
-		prefix="`echo $1|cut -f2 -d=`";
-		;;
-	*)
-		prefix="/usr/local"
-		;;
-esac
+ext_inc=
+ext_lib=
+use_mbtext=
+prefix="/usr/local"
+
+for a in $*; do
+	case "$a" in
+		--prefix=*)
+			prefix="`echo $a|cut -f2 -d=`";
+			;;
+		--ext-include=*)
+			ext_inc="-I`echo $a|cut -f2 -d=`";
+			;;
+		--ext-lib=*)
+			ext_lib="-L`echo $a|cut -f2 -d=`";
+			;;
+		--use-mbtext)
+			use_mbtext="-DUSE_MB_TEXT"
+			;;
+		--help|*)
+			echo "Usage: ./configure [OPTION]... [VAR=VALUE]..."
+			echo
+			echo "Options:"
+			echo "--help             Display help and exit"
+			echo "--prefix=DIR       Set install prefix"
+			echo "--ext-include=DIR  Extra header path"
+			echo "--ext-lib=DIR      Extra lib path"
+			#echo "--use-mbtext       Use Xlib's multibyte functions"
+			echo
+			exit
+			;;
+	esac
+done
+
+if [ -f VERSION ]; then
+	version=`cat VERSION`
+else
+	version=`date +"%Y-%m-%d"`
+fi
 
 echo -n "Checking for pkg-config... "
 xft_inc=`pkg-config --cflags xft 2>/dev/null`
@@ -66,17 +97,24 @@ else
 	echo yes
 fi
 
-echo "XFT_INC=$xft_inc" > Makefile.cfg
+echo "VERSION=$version" > Makefile.cfg
+echo "XFT_INC=$xft_inc" >> Makefile.cfg
 echo "XFT_LIB=$xft_lib" >> Makefile.cfg
 echo "IMLIB_INC=$imlib_inc" >> Makefile.cfg
 echo "IMLIB_LIB=$imlib_lib" >> Makefile.cfg
+echo "EXT_INC=$ext_inc" >> Makefile.cfg
+echo "EXT_LIB=$ext_lib" >> Makefile.cfg
 echo "PREFIX=$prefix" >> Makefile.cfg
+echo "USE_MB_TEXT=$use_mbtext" >> Makefile.cfg
 
 echo "Config:"
+echo "  Prefix: $prefix"
 echo "  Xft include: $xft_inc"
 echo "  Xft lib: $xft_lib"
 echo "  Imlib include: $imlib_inc"
 echo "  Imlib lib: $imlib_lib"
+echo "  Extra include: $ext_inc"
+echo "  Extra lib: $ext_lib"
 echo
 echo "Type \"make\" to start building vdesk"
 
