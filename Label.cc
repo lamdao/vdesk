@@ -64,13 +64,19 @@ void Label::SetCaption( char *text )
 void Label::UpdateBackground()
 {
 	ImlibImage *bg = VdeskBg->Crop( x, y, width, height );
-	uchar *rgb = bg->rgb_data;
 
-	long sum = 0;
-	for( int i = width * height - 1; i >= 0; i--, rgb += 3 )
-		sum += (19595 * rgb[0] + 38470 * rgb[1] + 7471 * rgb[2]) >> 16;
-	sum /= (width * height);
-	reverse = sum < 100;
+	if( AdaptiveText ) {
+		register uchar *rgb = bg->rgb_data;
+
+		long a = 0, b = 0;
+		for( int i = width * height; i > 0; i--, rgb += 3 ) {
+			if( ((19595 * rgb[0] + 38470 * rgb[1] + 7471 * rgb[2]) >> 16) <= DarkLevel )
+				a++;
+			else
+				b++;
+		}
+		reverse = (100 - DarkRatio) * a >= DarkRatio * b;
+	}
 
 	Imlib_apply_image( ScreenData, bg, this->handler );
 	Imlib_kill_image( ScreenData, bg );
@@ -78,10 +84,21 @@ void Label::UpdateBackground()
 //-----------------------------------------------------------------------------
 void Label::Update() 
 {
+	Color *fcolor, *scolor;
+
+	if( reverse ) {
+		fcolor = &BColor;
+		scolor = &RColor;
+	}
+	else {
+		fcolor = &FColor;
+		scolor = &SColor;
+	}
+
 	XClearWindow( display, this->handler );
 
-	for( int i=0; i<data.size(); i++ ) {
-		Text *txt = data[i];
+	for( int n = 0; n < data.size(); n++ ) {
+		Text *txt = data[n];
 		if( HighContrast ) {
 			for( int i = 0; i < 5; i++ ) {
 				canvas->DrawText( txt->x + i - 2, txt->y,
@@ -90,13 +107,13 @@ void Label::Update()
 							txt->data, txt->length, BColor );
 			}
 		}
-
+		else
 		if( Shadow ) {
 			canvas->DrawText( txt->x + ShadowX, txt->y + ShadowY,
-							txt->data, txt->length, SColor );
+							txt->data, txt->length, *scolor );
 		}
 
-		canvas->DrawText( txt->x, txt->y, txt->data, txt->length, reverse ? CSelectedText : FColor );
+		canvas->DrawText( txt->x, txt->y, txt->data, txt->length, *fcolor );
 	}
 }
 //-----------------------------------------------------------------------------
