@@ -1,4 +1,4 @@
- #include <sys/types.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include "LinkEditor.h"
@@ -75,8 +75,10 @@ void LinkEditor::Draw()
 void LinkEditor::Appear( XEvent *e )
 {
 	Dialog::Appear( e );
+	caption->ClearSelection();
+	command->ClearSelection();
+	icon->ClearSelection();
 	caption->SetFocus();
-	current = 0;
 	current = 0;
 }
 //----------------------------------------------------------------------------

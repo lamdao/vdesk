@@ -7,7 +7,10 @@
 //----------------------------------------------------------------------------
 class Editor: public WinControl, public EventControl {
 private:
-	int sp, cp, sw;
+	int mouse_down;
+	int left_margin, right_margin;
+
+	int sp, cp, sw, sl;
 	bool enabled, caret_visible;
 	string text;
 	Canvas *canvas;
@@ -17,15 +20,25 @@ public:
 	~Editor();
 
 	string GetText() const { return text; }
-	void SetText( string t ) { text = t; sp = cp = 0;}
-	void SetWidth( int w ) { Resize( w, height ); }
+	void SetText( string t ) { text = t; sp = cp = 0; }
+	void SetWidth( int w ) { Resize( w, height ); right_margin = w - 4; }
 	void SetEnabled( bool e );
 
 	virtual void Appear( XEvent *e );
 	virtual void KeyDown( XKeyEvent *e );
 	virtual void MousePress( XButtonEvent *e );
+	virtual void MouseMove( XMotionEvent *e );
+	virtual void MouseRelease( XButtonEvent *e );
 	virtual void HasFocus( XFocusInEvent *e );
 	virtual void LostFocus( XFocusOutEvent *e );
+
+	virtual void Cut();
+	virtual void Copy();
+	virtual void Paste();
+	virtual void Delete();
+
+	void ClearSelection() { sl = cp; }
+
 protected:
 	void Create();
 
@@ -34,6 +47,7 @@ protected:
 	void Draw();
 	void ShowCaret();
 	void HideCaret();
+	void MouseToCaretPosition( int p );
 };
 //----------------------------------------------------------------------------
 #endif
