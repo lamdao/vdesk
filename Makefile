@@ -1,8 +1,10 @@
 VERSION  = 0.0.92
 CC       = g++
 #USE_MB_TEXT = -DUSE_MB_TEXT
-FLAGS    = $(CXXFLAGS) $(USE_MB_TEXT) -DVERSION=\"$(VERSION)\" -I/usr/X11R6/include -I/usr/include/freetype2
-LIBS	 = `imlib-config --libs` -lXft
+XFT_INC  = $(shell pkg-config --cflags xft)
+XFT_LIB  = $(shell pkg-config --libs xft)
+FLAGS    = $(CXXFLAGS) $(USE_MB_TEXT) -DVERSION=\"$(VERSION)\" $(XFT_INC) 
+LIBS	 = `imlib-config --libs` $(XFT_LIB)
 VDESK    = vdesk
 
 OBJS     = Color.o BusyCursor.o Database.o Desktop.o Image.o Label.o Link.o Main.o \
