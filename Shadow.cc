@@ -5,8 +5,8 @@ Shadow *ControlShadow = NULL;
 //-----------------------------------------------------------------------------
 Shadow::Shadow(): Resource()
 {
-	Right = new WinControl( ExposureMask );
-	Bottom = new WinControl( ExposureMask );
+	Right = new WinControl( 0 );
+	Bottom = new WinControl( 0 );
 	Right->CreateHandler( 8, 8 );
 	Bottom->CreateHandler( 8, 8 );
 }
