@@ -10,6 +10,9 @@ bool Preferences::Locked = false;
 bool Preferences::FontBold = false;
 bool Preferences::SingleClick = false;
 //-----------------------------------------------------------------------------
+int Preferences::DarkRatio = 40;
+int Preferences::DarkLevel = 100;
+bool Preferences::AdaptiveText = false;
 bool Preferences::HighContrast = false;
 char *Preferences::HighContrastValue = NULL;
 //-----------------------------------------------------------------------------
@@ -68,6 +71,9 @@ void Preferences::Load()
 	Transparency = Config->QueryAsInt( "Transparency" );
 	HighContrast = Config->QueryAsBool( "HighContrast" );
 	HighContrastValue = Config->QueryAsStr( "HighContrast" );
+	AdaptiveText = HighContrast ? false : Config->QueryAsBool( "AdaptiveText" );
+	DarkLevel = Config->QueryAsInt( "DarkLevel", 100 );
+	DarkRatio = Config->QueryAsInt( "DarkRatio", 40 );
 
 	string ip( Config->QueryAsStr( "IconPath" ) );
 	if( ip != "" ) {
@@ -96,6 +102,10 @@ void Preferences::Save()
 	Config->Set( "ShadowY", ShadowY );
 	Config->Set( "SingleClick", SingleClick );
 	Config->Set( "Transparency", Transparency );
+	Config->Set( "AdaptiveText", AdaptiveText );
+	Config->Set( "DarkLevel", DarkLevel );
+	Config->Set( "DarkRatio", DarkRatio );
+
 	if( HighContrast && HighContrastValue && HighContrastValue[0] == '#' )
 		Config->Set( "HighContrast", string(HighContrastValue) );
 	else
@@ -112,6 +122,9 @@ void Preferences::SetDefaultConfig()
 	SingleClick = false;
 	Transparency = 80;
 	HighContrast = false;
+	AdaptiveText = true;
+	DarkLevel = 100;
+	DarkRatio = 40;
 	Save();
 
 	Config->Set( "FontName", string("clearlyu") );

@@ -10,12 +10,15 @@ protected:
 	static bool Locked;
 	static bool FontBold;
 	static bool SingleClick;
+	static bool AdaptiveText;
 	static bool HighContrast;
 	static char *HighContrastValue;
 	static bool Shadow;
 	static int ShadowX;
 	static int ShadowY;
 	static int Transparency;
+	static int DarkLevel;
+	static int DarkRatio;
 
 	static string HomeFolder;
 	static string VdeskFolder;
