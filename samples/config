@@ -1,0 +1,17 @@
+table Config
+	FontName: Arial
+	FontSize: 11
+	FontColor: #000000
+	PaddingX: 35
+	PaddingY: 5
+	Locked: false
+	HighContrast: true
+	Transparency: 80
+	Shadow: true
+	ShadowColor: #C0C0C0
+	ShadowX: 1
+	ShadowY: 2
+	Bold: false
+	SingleClick: true
+	XFontName: -microsoft-tahoma-medium-r-normal--0-0-0-0-p-0-iso10646-1
+end

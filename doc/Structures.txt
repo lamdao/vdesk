@@ -1,0 +1,18 @@
+Database
+Preferences
+  Resource
+    BusyCursor
+    Canvas
+    Text
+    Desktop
+    Window
+      Image
+      Label
+      Button
+    EventControl
+      Link
+        Device
+      PopupMenu
+      Dialog
+        Message
+      Editor

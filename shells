@@ -1,0 +1,4 @@
+table Shell
+	wine: Word.slk, Excel.slk, PowerPoint.slk
+	gnome: Gaim.slk, Xchat.slk
+end

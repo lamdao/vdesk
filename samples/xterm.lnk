@@ -1,0 +1,8 @@
+table Icon
+  Caption: xterm
+  Command: xterm
+  Icon: xterm.png
+  X: 939
+  Y: 94
+end
+

@@ -1,0 +1,13 @@
+table Icon
+  Caption: floppy
+  Command: 
+  Device: /dev/floppy
+  Folder: /mnt/floppy
+  Mount: mount
+  Umount: umount
+  Icon: floppy_off.png
+  ActiveIcon: floppy_on.png
+  X: 19
+  Y: 389
+end
+

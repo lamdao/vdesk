@@ -1,0 +1,18 @@
+* 0.0.92:
+	- Allow edit link
+	- Allow using <Tab> to switch to other control in Linke Editor,
+	using <Esc> to close, using <Spacebar> & <Enter> with Buttons
+	- Add background manager (auto change background image)
+	- Fixed "dirty" icon text
+	- Fixed mouse leave icon text bug
+	- Check file name/caption before save to link
+
+* 0.0.91:
+	- Fixed some bugs
+	- Add default icon/icon path
+
+* 0.0.90: (Initial release)
+	- Rewrite all idesk's components
+	- Add link editor dialog
+	- Add popup menu for icon
+	- Add device link

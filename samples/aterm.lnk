@@ -1,0 +1,8 @@
+table Icon
+  Caption: aterm
+  Command: aterm -cr white -tr -cr black
+  Icon: xterm.png
+  X: 17
+  Y: 201
+end
+

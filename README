@@ -1,0 +1,118 @@
+Vdesk README
+
+Vdesk is derived from Idesk and was written by MrChuoi <mrchuoi@yahoo.com>
+- The basic idea and alot of drawing code and database structures are come
+  from Idesk (written by Chris Roberts <nikon@sc.rr.com> -
+              http://dramamine.darktech.org/~nikon, ICQ: 63345004)
+- The idea of timer control is come from fluxbox (fluxbox.sf.net)
+
+* LICENSE
+Idesk is released under the BSD license, Fluxbox is released under GPL
+license, so Vdesk must be released under GPL/BSD license :))
+
+* CREDIT:
+- Chris Roberts <nikon@sc.rr.com>
+- All Fluxbox delvelopers (http://fluxbox.sf.net)
+- MrChuoi <mrchuoi@yahoo.com>
+
+* INSTALL
+ $ make
+ $ su
+ # cp idesk /usr/local/bin/vdesk
+
+* USAGE
+When starting at the first time, Vdesk will create $HOME/.vdesk &
+$HOME/.vdesk/config. If you're using Idesk (Idesk-0.3.5 with my patch)
+you can simply rename $HOME/.idesktop to $HOME/.vdesk or just make a
+soft link as follow:
+  $ cd $HOME
+  $ ln -s .idesktop .vdesk
+
+and then start Vdesk
+
+The content of $HOME/.vdesk/config looks like this:
+
+table Config
+  FontName: tahoma
+  FontSize: 8
+  FontColor: #ffffff
+  PaddingX: 35
+  PaddingY: 25
+  Locked: false
+  HighContrast: false
+  Transparency: 150
+  Shadow: true
+  ShadowColor: #000000
+  ShadowX: 1
+  ShadowY: 2
+  Bold: false
+  SingleClick: false
+  Background.Source: ~/.vdesk/backgrounds
+  Background.Delay: 3
+  Background.Mode: Stretch
+end
+
+"Locked" is boolean (true/false). "Transparency" is between 0 (no glow
+effect) and 255 (invisible without a mouseover).
+
+"HighContrast" will draw a border around the text in the opposite colour
+if it is true.  It will draw it in an arbitary colour if it "#aa00aa",
+for example.  And it will not draw anything at all if it is set to "false".
+
+"Shadow" is boolean (true/false). Turning this on will draw a drop shadow
+of color ShadowColor behind the text. The shadow will be ShadowX pixels
+right and ShadowY pixels down (negative values will work). Both ShadowX
+and ShadowY default to 1.
+
+"Bold" is a boolean (true/false). Setting it to true will make your font bold.
+
+"SingleClick" is a boolean (true/false). Setting it to true will allow you
+activate application with one mouse click (default is double click).
+
+"Background.Source" is a path to an image of a folder containing some images
+"Background.Delay" number of minutes the background will change to new one
+"Background.Mode" display mode of an image on the background (Stretch, Tile
+or Center)
+
+Unlike Idesk, to add an icon, you just activate Vdesk's popup menu (by hold
+down Ctrl key and press Right mouse button on desktop), and choose "Create
+link" item. A dialog box will show up, and you can input the information for
+a new link.
+
+The content of a link looks like this:
+
+table Icon
+  Caption: Home
+  Command: nautilus /home/you
+  Icon: /home/you/.idesktop/home.png
+end
+
+If you want to have multi-line icon text, use ";" as separator for lines:
+
+table Icon
+  Caption: Very long;text;string
+  Command: abc
+  Icon: /home/you/.idesktop/abc.png
+end
+
+You can create a link for device as follow:
+
+table Icon
+  Caption: cdrom
+  Command: nautilus /mnt/cdrom
+  Device: /dev/cdrom
+  Folder: /mnt/cdrom
+  Mount: mount -oro
+  Umount: umount
+  Icon: cdrom_off.png
+  ActiveIcon: cdrom_on.png
+end
+
+This kind of link can apply to smb, nfs, loop file, ... also!
+
+Other options are the same as Idesk
+
+* NOTE:
+You can find the current updated Idesk webpage at:
+http://linuxhelp.hn.org/idesk.php, maintained by Ivan (ivan@xpenguin.com).
+

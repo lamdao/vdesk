@@ -1,0 +1,34 @@
+#ifndef __PREFERENCES_H
+#define __PREFERENCES_H
+//------------------------------------------------------
+#include  "Database.h"
+//------------------------------------------------------
+class Preferences {
+protected:
+	static Table *Config;
+
+	static bool Locked;
+	static bool FontBold;
+	static bool SingleClick;
+	static bool HighContrast;
+	static char *HighContrastValue;
+	static bool Shadow;
+	static int ShadowX;
+	static int ShadowY;
+	static int Transparency;
+
+	static string HomeFolder;
+	static string VdeskFolder;
+	static vector<string> IconFolders;
+
+	void SetDefaultControlColor();
+	virtual void SetDefaultConfig();
+public:
+	Preferences();
+	~Preferences();
+
+	virtual void Load();
+	virtual void Save();
+};
+//------------------------------------------------------
+#endif

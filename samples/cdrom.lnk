@@ -1,0 +1,13 @@
+table Icon
+  Caption: cdrom
+  Command: 
+  Device: /dev/cdrom
+  Folder: /mnt/cdrom
+  Mount: mount -oro
+  Umount: umount
+  Icon: cdrom_off.png
+  ActiveIcon: cdrom_on.png
+  X: 20
+  Y: 294
+end
+
