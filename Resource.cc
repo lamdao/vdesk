@@ -26,6 +26,7 @@ int Resource::FontSize;
 string Resource::FontName;
 string Resource::XFontName;
 string Resource::DefaultIcon;
+int Resource::DefaultIconSize = 0;
 //-----------------------------------------------------------------------------
 XftFont *Resource::Font;
 Color Resource::FColor;
@@ -41,6 +42,10 @@ Color Resource::CDisabledText;
 //-----------------------------------------------------------------------------
 ImlibData *Resource::ScreenData = NULL;
 Background *Resource::background = NULL;
+//-----------------------------------------------------------------------------
+vector<char*> Resource::SystemPath;
+int Resource::MyUID = -1;
+int Resource::MyGID = -1;
 //-----------------------------------------------------------------------------
 Resource::Resource(): Preferences()
 {
@@ -67,6 +72,28 @@ Resource::Resource(): Preferences()
 								 Config->QueryAsStr( "Background.Mode" ),
 								 Config->QueryAsInt( "Background.Delay" ) );
 
+	DefaultIconSize = Config->QueryAsInt( "DefaultIconSize", 0 );
+	if( DefaultIconSize <= 0 )
+		DefaultIconSize = 0;
+	else
+	if( DefaultIconSize < 16 )
+		DefaultIconSize = 16;
+	else
+	if( DefaultIconSize > 128 )
+		DefaultIconSize = 128;
+
+	char *p = getenv( "PATH" );
+	if( p ) {
+		p = strdup( p );
+		p = strtok( p, ":" );
+		while( p ) {
+			SystemPath.push_back( p );
+			p = strtok( NULL, ":" );
+		}
+	}
+	MyUID = getuid();
+	MyGID = getgid();
+
 	LoadFont();
 	LoadColor();
 	LoadCursor();
@@ -77,6 +104,7 @@ Resource::~Resource()
 {
 	if( --count ) return;
 
+	free( SystemPath[0] );
 	delete background;
 
 	FreeCursor();
@@ -89,6 +117,10 @@ void Resource::CreateDefaultIcon()
 {
 	int size;
 	ImlibImage *p, *dc;
+
+	if( DefaultIconSize )
+		size = DefaultIconSize;
+	else
 	if( ScreenWidth<=800 )
 		size = 32;
 	else
@@ -99,6 +131,7 @@ void Resource::CreateDefaultIcon()
 		size = 100;
 	else
 		size = 64;
+
 	DefaultIcon = IconFolders[0] + "default.png";
 	dc = Imlib_load_image( ScreenData, (char *)DefaultIcon.c_str() );
 	if( !dc || size != dc->width ) {

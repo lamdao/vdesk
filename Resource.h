@@ -53,6 +53,7 @@ protected:
 	static string FontName;
 	static string XFontName;
 	static string DefaultIcon;
+	static int DefaultIconSize;
 
 	static XftFont *Font;
 	static Color FColor;
@@ -69,6 +70,8 @@ protected:
 	static ImlibData *ScreenData;
 	static Background *background;
 
+	static vector<char*> SystemPath;
+	static int MyUID, MyGID;
 public:
 	Resource();
 	~Resource();

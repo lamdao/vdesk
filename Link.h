@@ -31,6 +31,7 @@ protected:
 	string Caption;
 	bool Dragging;
 	bool Dragged;
+	bool executable;
 public:
 	Link( char *file, Table *t );
 	virtual ~Link();
@@ -69,6 +70,8 @@ public:
 	static void CreateMenu();
 	static void DeleteMenu();
 	static string ShowEditor( int x, int y );
+private:
+	void Check();
 };
 //-----------------------------------------------------------------------------
 #endif

@@ -19,6 +19,7 @@ public:
 	void Draw();
 	void SetGlowing( bool g );
 	void SetSource( char *f );
+	void SetBroken( bool b );
 
 private:
 	int Load( char *f );

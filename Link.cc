@@ -1,5 +1,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include "Link.h"
 #include "BusyCursor.h"
 #include "Dialog.h"
@@ -45,6 +47,7 @@ Link::Link( char *file, Table *t ): EventControl()
 	Text->SetEventControl( this );
 	Icon->SetEventControl( this );
 	SetPosition( x, y );
+	Check();
 }
 //-----------------------------------------------------------------------------
 Link::~Link()
@@ -109,6 +112,7 @@ void Link::Perform( int id )
 void Link::Edit()
 {
 	editor->Edit( this );
+	Check();
 }
 //-----------------------------------------------------------------------------
 void Link::Rename()
@@ -207,6 +211,40 @@ void Link::SetPosition( int x, int y )
 	Icon->MoveTo( x, y );
 }
 //-----------------------------------------------------------------------------
+void Link::Check()
+{
+	executable = false;
+	if( Command.length() > 0 ) {
+		struct stat b;
+		char *p = (char *)Command.c_str();
+		while( *p && *p==' ' ) p++;
+		if( !*p ) goto __set_status;
+		p = strtok( strdup(p), " " );
+		if( strrchr( p, '/' ) && stat( p, &b ) >= 0 && S_ISREG( b.st_mode ) ) {
+			if( (b.st_mode & S_IXOTH) ||
+				(b.st_uid == MyUID && (b.st_mode & S_IXUSR)) ||
+				(b.st_gid == MyGID && (b.st_mode & S_IXGRP)) )
+				executable = true;
+		}
+		else
+		for( int i=0; i<SystemPath.size(); i++ ) {
+			string cmd = string(SystemPath[i]) + "/" + p;
+			if( stat( cmd.c_str(), &b ) >= 0 ) {
+				if( !S_ISREG( b.st_mode ) ) continue;
+				if( (b.st_mode & S_IXOTH) ||
+					(b.st_uid == MyUID && (b.st_mode & S_IXUSR)) ||
+					(b.st_gid == MyGID && (b.st_mode & S_IXGRP)) ) {
+					executable = true;
+					break;
+				}
+			}
+		}
+		free( p );
+	}
+__set_status:
+	Icon->SetBroken( !executable );
+}
+//-----------------------------------------------------------------------------
 void Link::Appear( XEvent *e )
 {
 	Text->Update();
@@ -276,6 +314,11 @@ void Link::MouseMove( XMotionEvent *e )
 //----------------------------------------------------------------------------
 void Link::Execute()
 {
+	if( !executable ) {
+		Message::Error( 0, "File not found or don't have permision!" );
+		return;
+	}
+
 	ActiveWindow = Icon->Handler();
 	WaitCursor->Activate();
 
