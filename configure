@@ -3,6 +3,7 @@
 ext_inc=
 ext_lib=
 use_mbtext=
+use_pkgcfg=0
 prefix="/usr/local"
 
 for a in $*; do
@@ -19,6 +20,9 @@ for a in $*; do
 		--use-mbtext)
 			use_mbtext="-DUSE_MB_TEXT"
 			;;
+		--use-pkgcfg)
+			use_pkgcfg=1
+			;;
 		--help|*)
 			echo "Usage: ./configure [OPTION]... [VAR=VALUE]..."
 			echo
@@ -28,6 +32,7 @@ for a in $*; do
 			echo "--ext-include=DIR  Extra header path"
 			echo "--ext-lib=DIR      Extra lib path"
 			#echo "--use-mbtext       Use Xlib's multibyte functions"
+			echo "--use-pkgcfg       Force to use pkg-config to detect libs"
 			echo
 			exit
 			;;
@@ -40,68 +45,93 @@ else
 	version=`date +"%Y-%m-%d"`
 fi
 
-echo -n "Checking for pkg-config... "
-xft_inc=`pkg-config --cflags xft 2>/dev/null`
-if [ $? != 0 ]; then
-	echo no
-	have_pkgcfg=0
+if [ $use_pkgcfg != 1 ]; then
 	echo -n "Checking for xft-config... "
-	xft_inc=`xft-config --cflags 2>/dev/null`
+	v=`xft-config --version 2>/dev/null`
 	if [ $? != 0 ]; then
 		echo no
-		# Work around for old Xft including in XFree 4.0.x
-		echo -n "Checking naked Xft lib... "
-		for p in /usr/X11R6 /usr/local/X11R6 /opt/X11R6; do
-			if [ "`ls $p/lib/libXft.so*`" != "" ]; then
-				echo yes
-				xft_inc="-I$p/include -I$p/include/freetype -I$p/include/freetype2"
-				xft_lib="-L$p/lib -lX11 -lXft -lfreetype"
-				break
-			fi
-		done
+	else
+		echo yes
+		xft_inc=`xft-config --cflags 2>/dev/null`
+		xft_lib=`xft-config --libs 2>/dev/null`
+	fi
 
-		if [ "$xft_inc" = "" ]; then
-			echo "* ERROR: You MUST install xft lib to build vdesk!"
+	echo -n "Checking imlib-config... "
+	v=`imlib-config --version 2>/dev/null`
+	if [ $? != 0 ]; then
+		echo no
+	else
+		echo yes
+		imlib_inc=`imlib-config --cflags 2>/dev/null`
+		imlib_lib=`imlib-config --libs 2>/dev/null`
+	fi
+fi
+
+if [ "$xft_lib" = "" -o "$imlib_lib" = "" ]; then
+	echo -n "Checking for pkg-config... "
+	v=`pkg-config --version 2>/dev/null`
+	if [ $? != 0 ]; then
+		echo no
+		have_pkgcfg=0
+	else
+		echo yes
+		have_pkgcfg=1
+	fi
+
+	if [ $have_pkgcfg = 0 ]; then
+		if [ "$imlib_lib" = "" ]; then
+			echo "* ERROR: You MUST install imlib-1.9.x to build vdesk!"
 			sleep 5
 			exit 1
 		fi
-	else
-		echo yes
-		xft_lib=`xft-config --libs 2>/dev/null`
+		if [ "$xft_lib" = "" ]; then
+			# Work around for old Xft including in XFree 4.0.x
+			echo -n "Checking naked Xft lib... "
+			for p in /usr/X11R6 /usr/local/X11R6 /opt/X11R6; do
+				if [ "`ls $p/lib/libXft.so*`" != "" ]; then
+					echo yes
+					xft_inc="-I$p/include -I$p/include/freetype -I$p/include/freetype2"
+					xft_lib="-L$p/lib -lX11 -lXft -lfreetype"
+					break
+				fi
+			done
+
+			if [ "$xft_lib" = "" ]; then
+				echo "* ERROR: You MUST install xft lib to build vdesk!"
+				sleep 5
+				exit 1
+			fi
+		fi
 	fi
-else
-	echo yes
-	have_pkgcfg=1
-	xft_lib=`pkg-config --libs xft 2>/dev/null`
+
+	if [ "$xft_lib" = "" ]; then
+		xft_inc=`pkg-config --cflags xft 2>/dev/null`
+		xft_lib=`pkg-config --libs xft 2>/dev/null`
+	fi
+	if [ "$imlib_lib" = "" ]; then
+		imlib_inc=`pkg-config --cflags imlib 2>/dev/null`
+		imlib_lib=`pkg-config --libs imlib 2>/dev/null`
+	fi
 fi
 
-echo -n "Checking Xft... "
+echo -n "Checking Xft lib... "
 if [ "$xft_inc" != "" -a "$xft_lib" != "" ]; then
+	# TODO:
+	# Need to compile a simple source to make sure
+	# xft lib works properly here
 	echo yes
 else
 	echo no
 fi
 
 echo -n "Checking Imlib... "
-if [ $have_pkgcfg = 1 ]; then
-	imlib_inc=`pkg-config --cflags imlib 2>/dev/null`
-	if [ $? = 0 ]; then
-		imlib_lib=`pkg-config --libs imlib 2>/dev/null`
-	fi
-fi
-
-if [ "$imlib_inc" = "" ]; then
-	imlib_inc=`imlib-config --cflags 2>/dev/null`
-	if [ $? != 0 ]; then
-		echo no
-		echo "* ERROR: You MUST install imlib-1.9.x to build vdesk!"
-		sleep 5
-		exit 1
-	fi
+if [ "$imlib_inc" != "" -a "$imlib_lib" != "" ]; then
+	# TODO:
+	# Need to compile a simple source to make sure
+	# imlib works properly here
 	echo yes
-	imlib_lib=`imlib-config --libs 2>/dev/null`
 else
-	echo yes
+	echo no
 fi
 
 echo "VERSION=$version" > Makefile.cfg
