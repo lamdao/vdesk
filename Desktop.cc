@@ -8,6 +8,7 @@
 #include "Menu.h"
 #include "Dialog.h"
 #include <dirent.h>
+#include <X11/keysym.h>
 //-----------------------------------------------------------------------------
 enum {
 	DESKTOP_LINK	= 0,
@@ -224,9 +225,12 @@ void Desktop::Perform( int id )
 //----------------------------------------------------------------------------
 void Desktop::Process()
 {
-	XSelectInput( display, Root, SubstructureNotifyMask );
+	XGrabKey( display, XKeysymToKeycode(display, XK_Print), ControlMask, Root,
+				True, GrabModeAsync, GrabModeAsync );
 	XGrabButton( display, Button3, ControlMask, Root, True, ButtonReleaseMask,
 					GrabModeAsync, GrabModeAsync, None, None );
+	XSelectInput( display, Root, SubstructureNotifyMask );
+
 	while( !shutdown ) {
 		XEvent e;
 		if( !XPending( display ) )
@@ -236,6 +240,12 @@ void Desktop::Process()
 			EventControl *c = EventControl::Active();
 			if( c )
 				c->ProcessEvent( &e );
+			else
+			if( e.type == KeyPress /*&& e.xany.window == Root*/ ) {
+				cerr << "kc=" << ((XKeyEvent *)&e)->keycode << endl;
+				cerr <<	"ks=" << ((XKeyEvent *)&e)->state << endl;
+				//capturer->Activate( menu->X(), menu->Y() );
+			}
 			else
 				Desktop::ProcessEvent( &e );
 		}
@@ -249,10 +259,10 @@ void Desktop::ProcessEvent( XEvent *e )
 	if( c )
 		c->ProcessEvent( e );
 	else {
-		if( e->type==MapNotify )
+		if( e->type == MapNotify )
 			WaitCursor->Update();
 		else
-		if( e->type==ButtonRelease && e->xany.window==Root )
+		if( e->type == ButtonRelease && e->xany.window == Root )
 			menu->ShowAt( e->xbutton.x_root, e->xbutton.y_root );
 		else {
 			// TODO:
