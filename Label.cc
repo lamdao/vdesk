@@ -62,7 +62,7 @@ void Label::SetCaption( char *text )
 //-----------------------------------------------------------------------------
 void Label::UpdateBackground()
 {
-	ImlibImage *bg = background->Crop( x, y, width, height );
+	ImlibImage *bg = VdeskBg->Crop( x, y, width, height );
 	Imlib_apply_image( ScreenData, bg, this->handler );
 	Imlib_kill_image( ScreenData, bg );
 }

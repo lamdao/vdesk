@@ -216,10 +216,14 @@ void Link::Check()
 	executable = false;
 	if( Command.length() > 0 ) {
 		struct stat b;
-		char *p = (char *)Command.c_str();
+		char *s, *p = (char *)Command.c_str();
 		while( *p && *p==' ' ) p++;
 		if( !*p ) goto __set_status;
-		p = strtok( strdup(p), " " );
+		p = strtok( s = strdup(p), " " );
+		while( p && strchr( p, '=' ) ) {
+			p = strtok( NULL, " " );
+		}
+		if( !p ) goto __free_string;
 		if( strrchr( p, '/' ) && stat( p, &b ) >= 0 && S_ISREG( b.st_mode ) ) {
 			if( (b.st_mode & S_IXOTH) ||
 				(b.st_uid == MyUID && (b.st_mode & S_IXUSR)) ||
@@ -239,7 +243,8 @@ void Link::Check()
 				}
 			}
 		}
-		free( p );
+	__free_string:
+		free( s );
 	}
 __set_status:
 	Icon->SetBroken( !executable );

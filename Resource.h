@@ -68,7 +68,8 @@ protected:
 	static Color CDisabledText;
 
 	static ImlibData *ScreenData;
-	static Background *background;
+	static ImlibImage *BrokenIcon;
+	static Background *VdeskBg;
 
 	static vector<char*> SystemPath;
 	static int MyUID, MyGID;

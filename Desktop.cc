@@ -42,7 +42,7 @@ Desktop::Desktop(): Resource()
 	shutdown = false;
 	trash = new Trash();
 	timer = new Timer();
-	background->AddRefreshListener( this, DESKTOP_REFRESH );
+	VdeskBg->AddRefreshListener( this, DESKTOP_REFRESH );
 }
 //----------------------------------------------------------------------------
 Desktop::~Desktop()
@@ -120,7 +120,7 @@ void Desktop::Save()
 //----------------------------------------------------------------------------
 void Desktop::Refresh()
 {
-	if( !background->Refreshable() ) {
+	if( !VdeskBg->Refreshable() ) {
 		for( int i=0; i<items.size(); i++ )
 			items[i]->Update();
 	}
@@ -128,7 +128,7 @@ void Desktop::Refresh()
 		int i;
 		for( i=0; i<items.size(); i++ )
 			items[i]->Hide();
-		background->Refresh();
+		VdeskBg->Refresh();
 		for( i=0; i<items.size(); i++ )
 			items[i]->Show();
 	}

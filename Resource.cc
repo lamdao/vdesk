@@ -1,6 +1,7 @@
 #include "Resource.h"
 #include "BusyCursor.h"
 #include "Penguin.h"
+#include "Broken.h"
 #include "Background.h"
 //-----------------------------------------------------------------------------
 int Resource::count = 0;
@@ -41,7 +42,8 @@ Color Resource::CSelectedBar;
 Color Resource::CDisabledText;
 //-----------------------------------------------------------------------------
 ImlibData *Resource::ScreenData = NULL;
-Background *Resource::background = NULL;
+ImlibImage *Resource::BrokenIcon = NULL;
+Background *Resource::VdeskBg = NULL;
 //-----------------------------------------------------------------------------
 vector<char*> Resource::SystemPath;
 int Resource::MyUID = -1;
@@ -68,9 +70,11 @@ Resource::Resource(): Preferences()
 	Root = DefaultRootWindow( display );
 	VdeskCID = XUniqueContext();
 	ScreenData = Imlib_init( display );
-	background = new Background( Config->QueryAsStr( "Background.Source" ),
-								 Config->QueryAsStr( "Background.Mode" ),
-								 Config->QueryAsInt( "Background.Delay" ) );
+	BrokenIcon = Imlib_inlined_png_to_image( ScreenData, BrokenImage,
+								SIZE_OF_ARRAY(BrokenImage) );
+	VdeskBg = new Background( Config->QueryAsStr( "Background.Source" ),
+								Config->QueryAsStr( "Background.Mode" ),
+								Config->QueryAsInt( "Background.Delay" ) );
 
 	DefaultIconSize = Config->QueryAsInt( "DefaultIconSize", 0 );
 	if( DefaultIconSize <= 0 )
@@ -105,7 +109,8 @@ Resource::~Resource()
 	if( --count ) return;
 
 	free( SystemPath[0] );
-	delete background;
+	Imlib_kill_image( ScreenData, BrokenIcon );
+	delete VdeskBg;
 
 	FreeCursor();
 	FreeFont();

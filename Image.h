@@ -5,6 +5,7 @@
 //-----------------------------------------------------------------------------
 class Image: public WinControl {
 private:
+	bool broken;
 	bool Glowing;
 	bool FreeAlpha;
 
