@@ -225,10 +225,10 @@ void Desktop::Perform( int id )
 //----------------------------------------------------------------------------
 void Desktop::Process()
 {
-	XGrabKey( display, XKeysymToKeycode(display, XK_Print), Mod4Mask, Root,
+	XGrabKey( display, XKeysymToKeycode(display, XK_Print), ControlMask, Root,
 				True, GrabModeAsync, GrabModeAsync );
-	XGrabButton( display, Button3, Mod4Mask, Root, True, ButtonReleaseMask,
-					GrabModeAsync, GrabModeAsync, None, None );
+	XGrabButton( display, Resource::SysButton, Resource::SysKey, Root, True,
+				ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None );
 	XSelectInput( display, Root, SubstructureNotifyMask );
 
 	while( !shutdown ) {
