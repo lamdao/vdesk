@@ -5,20 +5,21 @@
 #include "Background.h"
 //----------------------------------------------------------------------------
 Background::Background( char *s, char *m, int d ): TimerControl(), Resource(),
-				SpareRoot(NULL), delay(0), current(-1), mode(0),
-				refreshable(false), source(NULL), controls(NULL), command(0)
+						save(NULL), show(NULL), SpareRoot(NULL),
+						delay(0), mode(0), refreshable(false),
+						source(NULL), srctime(0), images(""),
+						controls(NULL), command(0)
 {
 	Init();
 	ScanSource( source = strdup( s ) );
 	SetDelay( d );
+	ChangeImage();
 }
 //----------------------------------------------------------------------------
 Background::~Background()
 {
 	if( SpareRoot ) Imlib_kill_image( ScreenData, SpareRoot );
-	if( source ) free( source );
-	for( int i=0; i<data.size(); i++ )
-		delete data[i];
+	FreeData();
 }
 //----------------------------------------------------------------------------
 void Background::Init()
@@ -47,13 +48,35 @@ void Background::Init()
 		OriginalRoot = Imlib_create_image_from_drawable( ScreenData, Root, 0,
 							0, 0, ScreenWidth, ScreenHeight );
 #endif
+	if( !show ) {
+		show = &data[0];
+		save = &data[1];
+	}
+	srand( time(0) );
+}
+//----------------------------------------------------------------------------
+void Background::FreeData()
+{
+	if( source ) free( source );
+	for( int n=0; n<2; n++ ) {
+		for( int i=0; i<data[n].size(); i++ )
+			delete data[n][i];
+		data[n].clear();
+	}
+}
+//----------------------------------------------------------------------------
+void Background::SwapData()
+{
+	vector<char*> *p = show;
+	show = save;
+	save = p;
 }
 //----------------------------------------------------------------------------
 void Background::SetDelay( int d )
 {
 	if( d>=0 && d<=60 ) {
 		delay = d;
-		if( data.size()<=1 ) return;
+		if( show->size() + save->size() <= 1 ) return;
 		if( !delay )
 			Timer::Remove( this );
 		else
@@ -64,11 +87,7 @@ void Background::SetDelay( int d )
 void Background::SetSource( char *s )
 {
 	if( s ) {
-		if( source ) free( source );
-		for( int i=0; i<data.size(); i++ )
-			delete data[i];
-		data.clear();
-
+		FreeData();
 		ScanSource( source = strdup( s ) );
 	}
 }
@@ -93,29 +112,41 @@ ImlibImage *Background::Crop( int x, int y, int w, int h )
 //----------------------------------------------------------------------------
 void Background::ScanSource( char *s )
 {
-	if( s && *s ) {
-		struct stat b;
-		string path = s[0]=='~' ? HomeFolder + &s[1] : s;
+	if( !s || !*s ) return;
 
-		if( stat( path.c_str(), &b ) >= 0 ) {
-			if( !S_ISDIR( b.st_mode ) )
-				data.push_back( strdup( path.c_str() ) );
-			else {
-				struct dirent **files;
-				int n = scandir( path.c_str(), &files, 0, 0 );
-				path += "/";
-				for( int i=0; i<n; i++ ) {
-					if( !strcmp( files[i]->d_name, "." ) ||
-						!strcmp( files[i]->d_name, ".." ) ) continue;
+	struct stat b;
+	string path = s[0]=='~' ? HomeFolder + &s[1] : s;
 
-					string f = path + files[i]->d_name;
-					data.push_back( strdup( f.c_str() ) );
-					free( files[i] );
-				}
+	if( stat( path.c_str(), &b ) < 0 ) {
+		cerr << "[vdesk] Background's source not found." << endl;
+		return;
+	}
+
+	if( srctime == b.st_mtime ) return;
+
+	srctime = b.st_mtime;
+	if( !S_ISDIR( b.st_mode ) )
+		show->push_back( strdup( path.c_str() ) );
+	else {
+		struct dirent **files;
+		int p, n = scandir( path.c_str(), &files, 0, 0 );
+		path += "/";
+		for( int i=0; i<n; i++, free( files[i] ) ) {
+			string f = path + files[i]->d_name;
+			if( stat( f.c_str(), &b ) < 0 ) continue;
+			if( S_ISDIR( b.st_mode ) ) {
+				/* TODO: Each sub-folder will be loaded as collection
+				 */
+				continue;
 			}
+
+			p = images.find( "|" + f + "|" );
+			if( p >= 0 ) continue;
+
+			images += "|" + f + "|";
+			show->push_back( strdup( f.c_str() ) );
 		}
 	}
-	ChangeImage();
 }
 //----------------------------------------------------------------------------
 void Background::AddRefreshListener( ActionControl *a, int cmd )
@@ -134,14 +165,24 @@ void Background::ChangeImage()
 {
 	ImlibImage *si = NULL;
 
-	if( data.size() > 0 ) {
-		int c = current < 0 ? 0 : current;
+	if( !show->size() && save->size() )
+		SwapData();
 
-		current = c;
+	if( show->size() > 0 ) {
 		while( true ) {
-			si = Imlib_load_image( ScreenData, data[current] );
-			current = (current + 1) % data.size();
-			if( si || current==c ) break;
+			char *f;
+			int c = (int)((float)(show->size()-1) * rand() / (RAND_MAX+1.0));
+			si = Imlib_load_image( ScreenData, f = (*show)[c] );
+		#if 0
+			cerr << "[" << c << "/" << show->size() << "]" << f << endl;
+		#endif
+			show->erase( show->begin() + c );
+			if( si ) {
+				save->push_back( f );
+				break;
+			}
+			if( !show->size() )
+				SwapData();
 		}
 	}
 
@@ -166,5 +207,7 @@ void Background::ChangeImage()
 	Imlib_apply_image( ScreenData, SpareRoot, Root );
 	Imlib_free_pixmap( ScreenData, p );
 	Imlib_kill_image( ScreenData, si );
+
+	ScanSource( source );
 }
 //----------------------------------------------------------------------------
