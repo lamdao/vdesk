@@ -4,6 +4,8 @@
 #include <dirent.h>
 #include "Background.h"
 //----------------------------------------------------------------------------
+int VDESK_DELAY = 0;
+//----------------------------------------------------------------------------
 Background::Background( char *s, char *m, int d ): TimerControl(), Resource(),
 						save(NULL), show(NULL), SpareRoot(NULL),
 						delay(0), mode(0), refreshable(false),
@@ -48,6 +50,11 @@ void Background::Init()
 		OriginalRoot = Imlib_create_image_from_drawable( ScreenData, Root, 0,
 							0, 0, ScreenWidth, ScreenHeight );
 #endif
+	char *p = getenv( "__VDESK_DELAY__" );
+	if( p ) {
+		VDESK_DELAY = atoi( p );
+		if( VDESK_DELAY < 0 ) VDESK_DELAY = 0;
+	}
 	if( !show ) {
 		show = &data[0];
 		save = &data[1];
@@ -60,7 +67,7 @@ void Background::FreeData()
 	if( source ) free( source );
 	for( int n=0; n<2; n++ ) {
 		for( int i=0; i<data[n].size(); i++ )
-			delete data[n][i];
+			free( data[n][i] );
 		data[n].clear();
 	}
 }
@@ -79,8 +86,8 @@ void Background::SetDelay( int d )
 		if( show->size() + save->size() <= 1 ) return;
 		if( !delay )
 			Timer::Remove( this );
-		else
-			Timer::Add( this, delay * 60 );
+		else 
+			Timer::Add( this, VDESK_DELAY ? VDESK_DELAY : delay * 60 );
 	}
 }
 //----------------------------------------------------------------------------
@@ -170,18 +177,24 @@ void Background::ChangeImage()
 		SwapData();
 
 	if( show->size() > 0 ) {
+		string sf;
 		while( true ) {
 			char *f;
 			int c = (int)((float)(show->size()-1) * rand() / (RAND_MAX+1.0));
 			si = Imlib_load_image( ScreenData, f = (*show)[c] );
-		#if 0
-			cerr << "[" << c << "/" << show->size() << "]" << f << endl;
-		#endif
+			if( VDESK_DELAY )
+				cerr << "[" << c << "/" << show->size() << "]" << f << endl;
 			show->erase( show->begin() + c );
 			if( si ) {
 				save->push_back( f );
 				break;
 			}
+
+			sf = string("|") + f + "|";
+			c = images.find( sf.c_str() );
+			if( c >= 0 ) images.erase( c, sf.length() );
+			free( f );
+
 			if( !show->size() )
 				SwapData();
 		}
