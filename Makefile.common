@@ -32,7 +32,7 @@ config:
 	@$(MAKE)
 
 dep:
-	$(CXX) -MM $(XFT_INC) $(IMLIB_INC) $(EXT_INC) *.cc > Makefile.dep
+	$(CXX) -MM *.cc > Makefile.dep 2>/dev/null
 
 dep_build: dep
 	@$(MAKE)
