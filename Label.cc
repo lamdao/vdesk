@@ -70,7 +70,7 @@ void Label::UpdateBackground()
 
 		long a = 0, b = 0;
 		for( int i = width * height; i > 0; i--, rgb += 3 ) {
-			if( ((19595 * rgb[0] + 38470 * rgb[1] + 7471 * rgb[2]) >> 16) <= DarkLevel )
+			if( ((9798 * rgb[0] + 19235 * rgb[1] + 3736 * rgb[2]) >> 15) <= DarkLevel )
 				a++;
 			else
 				b++;
