@@ -42,6 +42,10 @@ distclean: clean
 	rm -f Makefile.dep
 	rm -f Makefile
 
+config:
+	@./configure
+	@$(MAKE)
+
 dep:
 	$(CXX) -MM $(XFT_INC) $(IMLIB_INC) *.cc > Makefile.dep
 	@$(MAKE)

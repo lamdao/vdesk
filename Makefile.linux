@@ -3,7 +3,12 @@ VDESK    = vdesk
 VERSION  = 0.0.92
 ifeq (Makefile.cfg,$(wildcard Makefile.cfg))
 include Makefile.cfg
+ifeq (Makefile.dep,$(wildcard Makefile.dep))
 do-it-all: $(VDESK)
+include Makefile.dep
+else
+do-it-all: dep
+endif
 else
 do-it-all: config
 endif
@@ -15,7 +20,7 @@ LIBS	 = $(IMLIB_LIB) $(XFT_LIB)
 OBJS     = Color.o BusyCursor.o Database.o Desktop.o Image.o Label.o Link.o \
 			Main.o Preferences.o Resource.o Window.o Canvas.o Text.o Device.o \
 			Event.o Menu.o Timer.o Trash.o Button.o Dialog.o Editor.o \
-			LinkEditor.o Background.o
+			LinkEditor.o Background.o Shadow.o
 
 all: do-it-all
 
@@ -34,9 +39,14 @@ clean:
 distclean: clean
 	rm -f .*.sw*
 	rm -f Makefile.cfg
+	rm -f Makefile.dep
+	rm -f Makefile
 
 config:
-	@./configure --no-report
+	@./configure
 	@$(MAKE)
 
-include Makefile.dep
+dep:
+	$(CXX) -MM $(XFT_INC) $(IMLIB_INC) *.cc > Makefile.dep
+	@$(MAKE)
+
