@@ -9,6 +9,7 @@ class Label: public WinControl {
 private:
 	char *caption;
 	vector<Text*> data;
+	bool reverse;
 
 	Canvas *canvas;
 public:

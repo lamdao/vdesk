@@ -12,6 +12,7 @@ Label::Label( char *text ): WinControl( ID_TEXTMASK )
 	canvas = new Canvas( this->handler );
 	caption = NULL;
 	SetCaption( text );
+	reverse = false;
 }
 //-----------------------------------------------------------------------------
 Label::~Label()
@@ -63,6 +64,14 @@ void Label::SetCaption( char *text )
 void Label::UpdateBackground()
 {
 	ImlibImage *bg = VdeskBg->Crop( x, y, width, height );
+	uchar *rgb = bg->rgb_data;
+
+	long sum = 0;
+	for( int i = width * height - 1; i >= 0; i--, rgb += 3 )
+		sum += (19595 * rgb[0] + 38470 * rgb[1] + 7471 * rgb[2]) >> 16;
+	sum /= (width * height);
+	reverse = sum < 100;
+
 	Imlib_apply_image( ScreenData, bg, this->handler );
 	Imlib_kill_image( ScreenData, bg );
 }
@@ -87,7 +96,7 @@ void Label::Update()
 							txt->data, txt->length, SColor );
 		}
 
-		canvas->DrawText( txt->x, txt->y, txt->data, txt->length, FColor );
+		canvas->DrawText( txt->x, txt->y, txt->data, txt->length, reverse ? CSelectedText : FColor );
 	}
 }
 //-----------------------------------------------------------------------------
