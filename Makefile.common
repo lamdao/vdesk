@@ -10,7 +10,7 @@ OBJS  = Color.o BusyCursor.o Database.o Desktop.o Image.o Label.o Link.o \
 all: do-it-all
 
 $(VDESK): $(OBJS)
-	$(CXX) $(OBJS) -o $(VDESK) $(LIBS)
+	$(CXX) $(LDFLAGS) $(OBJS) -o $(VDESK) $(LIBS)
 
 .cc.o:
 	$(CXX) $(FLAGS) -c $< -o $@
