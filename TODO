@@ -2,7 +2,6 @@
 	- Vdesk's settings dialog
 	- Add Device link editor
 	- Add Label editor (using in rename function)
-	- Select/Cut/Copy/Paste in Editor field
 	- Rewrite Device::Execute( cmd ) to avoid blocking (fork/exec + timer)
 	- Color dialog
 	- File/Icon browser dialog

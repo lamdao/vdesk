@@ -1,5 +1,8 @@
 * 0.0.93: (alpha 3)
-	- Replace Ctrl by Mod4 (Window key)
+	- Use constant instant of string in Database class to speed up
+	- Implement Copy/Cut/Paste (interracting with X Cut Buffer)
+	- <Enter> on edit field of dialog will issue Accept command
+	- Allow setting Vdesk's system hotkey/button (default: Ctrl+RightClick)
 	- Fixed vdesk crash when loading big apps (OO, Mozilla, Opera...)
 	- Use $LDFLAGS
 
