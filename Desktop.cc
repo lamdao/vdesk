@@ -217,18 +217,16 @@ void Desktop::Perform( int id )
 							"http://xvnkb.sourceforge.net/vdesk");
 			break;
 		case DESKTOP_EXIT:
-			exit( 0 );
 			shutdown = true;
+			exit( 0 );
 			break;
 	}
 }
 //----------------------------------------------------------------------------
 void Desktop::Process()
 {
-	XGrabKey( display, XKeysymToKeycode(display, XK_Print), ControlMask, Root,
-				True, GrabModeAsync, GrabModeAsync );
-	XGrabButton( display, Resource::SysButton, Resource::SysKey, Root, True,
-				ButtonReleaseMask, GrabModeAsync, GrabModeAsync, None, None );
+	GrabKey( XK_Print, ControlMask );
+	GrabButton( Resource::SysButton, Resource::SysKey, ButtonReleaseMask );
 	XSelectInput( display, Root, SubstructureNotifyMask );
 
 	while( !shutdown ) {
@@ -241,15 +239,8 @@ void Desktop::Process()
 			if( c )
 				c->ProcessEvent( &e );
 			else
-			if( e.type == KeyPress && e.xany.window == Root ) {
-				int x = menu->X();
-				int y = menu->Y();
-				if( x + capturer->Width() > ScreenWidth )
-					x = ScreenWidth - capturer->Width() - 1;
-				if( y + capturer->Height() > ScreenHeight )
-					y = ScreenHeight - capturer->Height() - 1;
-				capturer->Activate( x, y );
-			}
+			if( e.type == KeyPress && e.xany.window == Root )
+				capturer->Activate( menu->X(), menu->Y() );
 			else
 				Desktop::ProcessEvent( &e );
 		}
@@ -271,6 +262,10 @@ void Desktop::ProcessEvent( XEvent *e )
 		else {
 			// TODO:
 			// Send e to e.xany.window
+			/*
+			if( e->xany.window == Root )
+				printf("type = %d\n", e->type);
+			*/
 		}
 	}
 }
