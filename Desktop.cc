@@ -13,9 +13,10 @@ enum {
 	DESKTOP_REFRESH	= 2,
 	DESKTOP_RELOAD	= 3,
 	DESKTOP_LOCK	= 4,
-	DESKTOP_SETTING = 6,
-	DESKTOP_ABOUT	= 7,
-	DESKTOP_EXIT	= 9,
+	DESKTOP_CAPTURE	= 6
+	DESKTOP_SETTING = 8,
+	DESKTOP_ABOUT	= 9,
+	DESKTOP_EXIT	= 11,
 };
 //-----------------------------------------------------------------------------
 static MenuItem vdesk_items[] = {
@@ -24,6 +25,8 @@ static MenuItem vdesk_items[] = {
 	MenuItem( DESKTOP_REFRESH, "Refresh" ),
 	MenuItem( DESKTOP_RELOAD, "Reload" ),
 	MenuItem( DESKTOP_LOCK, "Lock icon" ),
+	MenuSeparator(),
+	MenuItem( DESKTOP_CAPTURE, "Screen capture" ),
 	MenuSeparator(),
 	MenuItem( DESKTOP_SETTING, "Settings..." ),
 	MenuItem( DESKTOP_ABOUT, "About" ),
@@ -198,6 +201,10 @@ void Desktop::Perform( int id )
 			break;
 		case DESKTOP_LOCK:
 			SetLock( !Locked );
+			break;
+		case DESKTOP_CAPTURE:
+			break;
+		case DESKTOP_SETTING:
 			break;
 		case DESKTOP_ABOUT:
 			Message::Info(	"Vdesk version "VERSION"\n"
