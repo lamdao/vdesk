@@ -42,8 +42,8 @@ Link::Link( char *file, Table *t ): EventControl()
 	width = max( Icon->Width(), Text->Width() );
 	height = Icon->Height() + Text->Height() + ICON_TEXT_SPACE;
 
-	Icon->SetEventControl( this );
 	Text->SetEventControl( this );
+	Icon->SetEventControl( this );
 	SetPosition( x, y );
 }
 //-----------------------------------------------------------------------------
@@ -188,10 +188,7 @@ void Link::Hide()
 //-----------------------------------------------------------------------------
 void Link::Update()
 {
-//	Text->Hide();
-//	SetPosition( x, y );
 	Text->UpdateBackground();
-//	Text->Show();
 	Text->Update();
 	Icon->Draw();
 }
