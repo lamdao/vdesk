@@ -299,3 +299,60 @@ void Resource::Save()
 	Database::SaveToFile( VdeskFolder + "config", Config );
 }
 //-----------------------------------------------------------------------------
+void Resource::GrabButton(int Button, int Key, int Mask)
+{
+	// Nothing
+	XGrabButton( display, Button, Key, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// NumLock
+	XGrabButton( display, Button, Key|Mod2Mask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// CapsLock
+	XGrabButton( display, Button, Key|LockMask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// ScrollLock
+	XGrabButton( display, Button, Key|Mod5Mask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// NumLock & CapsLock
+	XGrabButton( display, Button, Key|Mod2Mask|LockMask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// NumLock & ScrollLock
+	XGrabButton( display, Button, Key|Mod2Mask|Mod5Mask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// CapsLock & ScrollLock
+	XGrabButton( display, Button, Key|Mod5Mask|LockMask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+	// NumLock & CapsLock & ScrollLock
+	XGrabButton( display, Button, Key|Mod2Mask|Mod5Mask|LockMask, Root, True,
+				Mask, GrabModeAsync, GrabModeAsync, None, None );
+}
+//-----------------------------------------------------------------------------
+void Resource::GrabKey(int Key, int Mask)
+{
+	KeyCode kc = XKeysymToKeycode(display, Key);
+
+	XGrabKey( display, kc, Mask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// NumLock
+	XGrabKey( display, kc, Mask|Mod2Mask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// CapsLock
+	XGrabKey( display, kc, Mask|LockMask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// ScrollLock
+	XGrabKey( display, kc, Mask|Mod5Mask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// NumLock & CapsLock
+	XGrabKey( display, kc, Mask|Mod2Mask|LockMask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// NumLock & ScrollLock
+	XGrabKey( display, kc, Mask|Mod2Mask|Mod5Mask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// CapsLock & ScrollLock
+	XGrabKey( display, kc, Mask|LockMask|Mod5Mask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+	// NumLock & CapsLock & ScrollLock
+	XGrabKey( display, kc, Mask|Mod2Mask|LockMask|Mod5Mask, Root, True,
+			GrabModeAsync, GrabModeAsync );
+}
+//-----------------------------------------------------------------------------

@@ -81,6 +81,9 @@ public:
 	Resource();
 	~Resource();
 
+	void GrabKey(int Key, int Mask);
+	void GrabButton(int Button, int Key, int Mask);
+
 protected:
 #ifdef USE_MB_TEXT
 	void LocaleInit();
