@@ -35,7 +35,8 @@ public:
 	virtual void NextControl();
 	virtual void PrevControl();
 	virtual void SetActiveControl( WinControl *c );
-	virtual void CancelProcess() { Hide(); SetVisibled( false ); }
+	virtual void CancelProcess() { Perform(1); }
+	virtual void AcceptProcess() { Perform(0); }
 
 protected:
 	virtual void Draw();
