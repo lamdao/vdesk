@@ -57,6 +57,8 @@ protected:
 	string title;
 
 	int defwidth;
+
+	static PopupMenu *CurrentMenu;
 public:
 	PopupMenu( MenuItem *item, int count );
 	virtual ~PopupMenu();
