@@ -10,35 +10,50 @@ case "$1" in
 esac
 
 echo -n "Checking for pkg-config... "
-xft_inc=`pkg-config --cflags xft`
+xft_inc=`pkg-config --cflags xft 2>/dev/null`
 if [ $? != 0 ]; then
 	echo no
 	have_pkgcfg=0
 	echo -n "Checking for xft-config... "
-	xft_inc=`xft-config --cflags`
+	xft_inc=`xft-config --cflags 2>/dev/null`
 	if [ $? != 0 ]; then
 		echo no
-		echo "* ERROR: You MUST install xft lib to build vdesk!"
-		sleep 5
-		exit 1
+		# Work around for old Xft including in XFree 4.0.x
+		echo -n "Checking naked Xft lib... "
+		for p in /usr/X11R6 /usr/local/X11R6 /opt/X11R6; do
+			if [ "`ls $p/lib/libXft.so*`" != "" ]; then
+				echo yes
+				xft_inc="-I$p/include -I$p/include/freetype -I$p/include/freetype2"
+				xft_lib="-L$p/lib -lX11 -lXft -lfreetype"
+				break
+			fi
+		done
+
+		if [ "$xft_inc" = "" ]; then
+			echo "* ERROR: You MUST install xft lib to build vdesk!"
+			sleep 5
+			exit 1
+		fi
+	else
+		echo yes
+		xft_lib=`xft-config --libs 2>/dev/null`
 	fi
-	xft_lib=`xft-config --libs`
 else
 	echo yes
 	have_pkgcfg=1
-	xft_lib=`pkg-config --libs xft`
+	xft_lib=`pkg-config --libs xft 2>/dev/null`
 fi
 
 echo -n "Checking Imlib... "
 if [ $have_pkgcfg = 1 ]; then
-	imlib_inc=`pkg-config --cflags imlib`
+	imlib_inc=`pkg-config --cflags imlib 2>/dev/null`
 	if [ $? = 0 ]; then
-		imlib_lib=`pkg-config --libs imlib`
+		imlib_lib=`pkg-config --libs imlib 2>/dev/null`
 	fi
 fi
 
 if [ "$imlib_inc" = "" ]; then
-	imlib_inc=`imlib-config --cflags`
+	imlib_inc=`imlib-config --cflags 2>/dev/null`
 	if [ $? != 0 ]; then
 		echo no
 		echo "* ERROR: You MUST install imlib-1.9.x to build vdesk!"
@@ -46,7 +61,7 @@ if [ "$imlib_inc" = "" ]; then
 		exit 1
 	fi
 	echo yes
-	imlib_lib=`imlib-config --libs`
+	imlib_lib=`imlib-config --libs 2>/dev/null`
 else
 	echo yes
 fi
