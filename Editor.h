@@ -20,7 +20,7 @@ public:
 	~Editor();
 
 	string GetText() const { return text; }
-	void SetText( string t ) { text = t; sp = cp = 0; }
+	void SetText( string t ) { text = t; sp = cp = sl = 0; }
 	void SetWidth( int w ) { Resize( w, height ); right_margin = w - 4; }
 	void SetEnabled( bool e );
 
