@@ -19,6 +19,30 @@ void Color::Free()
 	}
 }
 //----------------------------------------------------------------------------
+void Color::Copy( const Color &c, bool reverse )
+{
+	ready = c.ready;
+	if( ready ) {
+		if( !reverse ) {
+			XRenderColor xrdc;
+			xrdc.red = c.data.color.red;
+			xrdc.blue = c.data.color.blue;
+			xrdc.green = c.data.color.green;
+			XftColorAllocValue( Resource::display, Resource::ScreenVisual,
+					Resource::ScreenColormap, &xrdc, &data );
+		}
+		else {
+			char s[32];
+			sprintf( s, "#%02X%02X%02X",
+						(uchar)(255 - (c.data.color.red >> 8)),
+						(uchar)(255 - (c.data.color.blue >> 8)),
+						(uchar)(255 - (c.data.color.green >> 8)) );
+			XftColorAllocName( Resource::display, Resource::ScreenVisual,
+					Resource::ScreenColormap, s, &data );
+		}
+	}
+}
+//----------------------------------------------------------------------------
 void Color::Set( const char *name )
 {
 	if( !name ) return;
@@ -34,9 +58,9 @@ void Color::Set( int v, const XftColor *c )
 	XRenderColor xrdc;
 
 	Free();
-	xrdc.red = 65535 - c->color.red;
-	xrdc.blue = 65535 - c->color.blue;
-	xrdc.green = 65535 - c->color.green;
+	xrdc.red = (ushort)v - c->color.red;
+	xrdc.blue = (ushort)v - c->color.blue;
+	xrdc.green = (ushort)v - c->color.green;
 	XftColorAllocValue( Resource::display, Resource::ScreenVisual,
 			Resource::ScreenColormap, &xrdc, &data );
 	ready = true;
