@@ -99,8 +99,8 @@ table Icon
   Icon: abc.png
 end
 
-* NOTE: an icon without path will be searched order: ~/.vdesk/icons, ~/.vdesk,
-and all paths in IconPath field of Config table
+* NOTE: an icon without path will be searched in order: ~/.vdesk/icons,
+~/.vdesk, and all paths in IconPath field of Config table
 
 You can create a link for device as follow:
 
