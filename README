@@ -76,7 +76,7 @@ doesn't have the path (See below)
 "Background.Source" is a path to an image of a folder containing some images
 "Background.Delay" number of minutes the background will change to new one
 "Background.Mode" display mode of an image on the background (Stretch, Tile
-or Center)
+or Center - only Stretch is working now)
 
 Unlike Idesk, to add an icon, you just activate Vdesk's popup menu (by holding
 down Ctrl key and press Right mouse button on desktop), and choose "Create
