@@ -119,9 +119,11 @@ void ScreenCapture::Activate( int x, int y )
 
 	Show();
 	if( Accepted() ) {
-		save_folder = dirname( (char *)name->GetText().c_str() );
+		char *d = strdup( (char *)name->GetText().c_str() );
+		save_folder = dirname( d );
 		save_folder += "/";
 		Imlib_save_image( ScreenData, shot, (char *)name->GetText().c_str(), NULL );
+		free( d );
 	}
 	Imlib_kill_image( ScreenData, shot );
 }
