@@ -1,3 +1,7 @@
+* 0.0.93: (alpha 3)
+	- Fixed vdesk crash when loading big apps (OO, Mozilla, Opera...)
+	- Use $LDFLAGS
+
 * 0.0.92: (alpha 2)
 	- Add Screen capture
 	- Add shadow for menu & dialogs
