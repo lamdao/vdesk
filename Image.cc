@@ -79,11 +79,12 @@ void Image::SetBroken( bool b )
 //-----------------------------------------------------------------------------
 void Image::Draw()
 {
+	int i, j, a;
 	ImlibImage *bg = VdeskBg->Crop( x, y, width, height );
 	uchar *bgrgb, *alpha_levels = alpha[Glowing ? 1 : 0];
 
 	bgrgb = bg->rgb_data;
-	for( int i=0, a=0; i<(3*width*height); i+=3, a++) {
+	for( i=0, a=0; i<(3*width*height); i+=3, a++) {
 		int alevel = ( (alpha_levels != 0) ? alpha_levels[a] : 255 );
 		if( alevel == 0 ) {
 			bgrgb[i] = bgrgb[i+2] = 255;
@@ -96,23 +97,24 @@ void Image::Draw()
 		bgrgb[i+2] = (bgrgb[i+2] * rlevel)/255 + (rgb[i+2] * alevel)/255;
 	}
 
+	if( broken ) {
+		int sx = (width - BrokenIcon->rgb_width) / 2,
+			sy = height - 1,
+			ss[] = {2,1,0,0,0,0,0,0,0,0,0,0,1,2};
+
+		for( i = BrokenIcon->rgb_height - 2; i > 0; i--, sy-- ) {
+			uchar *d = &bgrgb[3 * (sy * width + sx + ss[i-1])];
+			uchar *s = &BrokenIcon->rgb_data[3 * (i * BrokenIcon->rgb_width + ss[i-1])];
+			for( j = 3 * (BrokenIcon->rgb_width - 2*ss[i-1]); j > 0; j-- )
+				*d++ = *s++;
+		}
+	}
+
 	ImlibColor IClr = {255, 0, 255, 0};
 	Imlib_set_image_shape( ScreenData, bg, &IClr );
 
 	Imlib_apply_image( ScreenData, bg, this->handler );
 	Imlib_kill_image( ScreenData, bg );
-	if( broken ) {
-		Imlib_paste_image( ScreenData, BrokenIcon, this->handler,
-					(width - BrokenIcon->rgb_width) / 2,
-					height - BrokenIcon->rgb_height - 2,
-					BrokenIcon->rgb_width, BrokenIcon->rgb_height );
-		/*
-		bg = Imlib_create_image_from_drawable( ScreenData, this->handler, 0,
-					0, 0, width, height );
-		Imlib_apply_image( ScreenData, bg, this->handler );
-		Imlib_kill_image( ScreenData, bg );
-		*/
-	}
 }
 //-----------------------------------------------------------------------------
 int Image::Load( char *f )
@@ -233,7 +235,6 @@ int Image::Load( char *f )
 				*aptr++ = a - Transparency;
 				*aptr2++ = a;
 			}
-
 		}
 	} 
 
