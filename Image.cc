@@ -7,7 +7,7 @@
 	ButtonPressMask|ButtonReleaseMask|PointerMotionMask|\
 	EnterWindowMask|LeaveWindowMask
 //-----------------------------------------------------------------------------
-Image::Image( char *f ): WinControl( ID_IMAGEMASK )
+Image::Image( char *f, Window p ): WinControl( p, ID_IMAGEMASK, 0 )
 {
 	source = NULL;
 	Glowing = false;

@@ -14,7 +14,7 @@ private:
 	ImlibImage *source;
 
 public:
-	Image( char *f );
+	Image( char *f, Window p = Root );
 	virtual ~Image();
 
 	void Draw();
