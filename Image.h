@@ -8,10 +8,11 @@ private:
 	bool broken;
 	bool Glowing;
 	bool FreeAlpha;
+	bool StateChanged;
 
 	uchar *rgb;
 	uchar *alpha[2];
-	ImlibImage *source;
+	ImlibImage *source, *bg;
 
 public:
 	Image( char *f, Window p = Root );

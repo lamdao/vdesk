@@ -9,9 +9,11 @@
 //-----------------------------------------------------------------------------
 Image::Image( char *f, Window p ): WinControl( p, ID_IMAGEMASK, 0 )
 {
+	bg = NULL;
 	source = NULL;
 	Glowing = false;
 	FreeAlpha = false;
+	StateChanged = false;
 	broken = false;
 
 	SetSource( f );
@@ -29,6 +31,10 @@ void Image::FreeBuffer()
 		delete [] rgb;
 		delete [] alpha[0];
 		delete [] alpha[1];
+	}
+	if( bg ) {
+		Imlib_kill_image( ScreenData, bg );
+		bg = NULL;
 	}
 	if( source ) {
 		Imlib_kill_image( ScreenData, source );
@@ -63,9 +69,11 @@ void Image::SetSource( char *f )
 //-----------------------------------------------------------------------------
 void Image::SetGlowing( bool g )
 {
-	if( Glowing!=g ) {
+	if( Glowing != g ) {
+		StateChanged = true;
 		Glowing = g;
 		Draw();
+		StateChanged = false;
 	}
 }
 //-----------------------------------------------------------------------------
@@ -80,15 +88,20 @@ void Image::SetBroken( bool b )
 void Image::Draw()
 {
 	int i, j, a;
-	ImlibImage *bg = VdeskBg->Crop( x, y, width, height );
 	uchar *bgrgb, *alpha_levels = alpha[Glowing ? 1 : 0];
+	ImlibImage *bgcopy;
 
-	bgrgb = bg->rgb_data;
-	for( i=0, a=0; i<(3*width*height); i+=3, a++) {
+	if( !StateChanged ) {
+		if( bg != NULL ) Imlib_kill_image( ScreenData, bg );
+		bg = VdeskBg->Crop( x, y, width, height );
+	}
+	bgcopy = Imlib_clone_image( ScreenData, bg );
+	bgrgb = bgcopy->rgb_data;
+	for( i = 0, a = 0; i < (3 * width * height); i += 3, a++ ) {
 		int alevel = ( (alpha_levels != 0) ? alpha_levels[a] : 255 );
 		if( alevel == 0 ) {
-			bgrgb[i] = bgrgb[i+2] = 255;
-			bgrgb[i+1] = 0;
+			bgrgb[i] = bgrgb[i + 2] = 255;
+			bgrgb[i + 1] = 0;
 			continue;
 		}
 		int rlevel = 255 - alevel;
@@ -111,10 +124,10 @@ void Image::Draw()
 	}
 
 	ImlibColor IClr = {255, 0, 255, 0};
-	Imlib_set_image_shape( ScreenData, bg, &IClr );
+	Imlib_set_image_shape( ScreenData, bgcopy, &IClr );
 
-	Imlib_apply_image( ScreenData, bg, this->handler );
-	Imlib_kill_image( ScreenData, bg );
+	Imlib_apply_image( ScreenData, bgcopy, this->handler );
+	Imlib_kill_image( ScreenData, bgcopy );
 }
 //-----------------------------------------------------------------------------
 int Image::Load( char *f )
