@@ -5,7 +5,7 @@ LIBS  = $(EXT_LIB) $(XFT_LIB) $(IMLIB_LIB)
 OBJS  = Color.o BusyCursor.o Database.o Desktop.o Image.o Label.o Link.o \
 		Main.o Preferences.o Resource.o Window.o Canvas.o Text.o Device.o \
 		Event.o Menu.o Timer.o Trash.o Button.o Dialog.o Editor.o LinkEditor.o \
-		Background.o Shadow.o
+		Background.o Shadow.o ScreenCapture.o
 
 all: do-it-all
 

@@ -1,6 +1,7 @@
 #include "Background.h"
 #include "Desktop.h"
 #include "BusyCursor.h"
+#include "ScreenCapture.h"
 #include "Device.h"
 #include "Timer.h"
 #include "Trash.h"
@@ -45,11 +46,13 @@ Desktop::Desktop(): Resource()
 	shutdown = false;
 	trash = new Trash();
 	timer = new Timer();
+	capturer = new ScreenCapture();
 	VdeskBg->AddRefreshListener( this, DESKTOP_REFRESH );
 }
 //----------------------------------------------------------------------------
 Desktop::~Desktop()
 {
+	delete capturer;
 	delete timer;
 	delete trash;
 
@@ -203,6 +206,7 @@ void Desktop::Perform( int id )
 			SetLock( !Locked );
 			break;
 		case DESKTOP_CAPTURE:
+			capturer->Activate( menu->X(), menu->Y() );
 			break;
 		case DESKTOP_SETTING:
 			break;

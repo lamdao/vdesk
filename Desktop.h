@@ -7,12 +7,14 @@
 //----------------------------------------------------------------------------
 class Timer;
 class Trash;
+class ScreenCapture;
 //----------------------------------------------------------------------------
 class Desktop: public Resource, public Container, public ActionControl {
 private:
 	vector<Link*> items;
 	Timer *timer;
 	Trash *trash;
+	ScreenCapture *capturer;
 
 	bool shutdown;
 public:

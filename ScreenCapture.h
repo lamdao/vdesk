@@ -11,6 +11,8 @@ private:
 
 	Button *save;
 	Button *cancel;
+
+	string save_folder;
 public:
 	ScreenCapture();
 	~ScreenCapture();

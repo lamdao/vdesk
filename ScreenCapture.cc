@@ -1,40 +1,40 @@
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <libgen.h>
+#include "Text.h"
 #include "ScreenCapture.h"
 //----------------------------------------------------------------------------
 ScreenCapture::ScreenCapture(): Dialog()
 {
-	struct {
-		char *text;
-		Editor **editor;
-	} p[] = {
-		{ "File:", &name },
-	};
-
 	width = 300;
-	height = 300;
+	height = 340;
 	x = (ScreenWidth - width) / 2;
 	y = (ScreenHeight - height) / 2;
+	save_folder = HomeFolder;
 
 	CreateHandler();
 	SetEventControl( this );
 	SetTitle( "Screen capture" );
 	canvas = new Canvas( this->handler );
 
-	sample = new WinControl( this->handler, 0 );
-	sample->CreateHandler( 22, Font->ascent + 42, 256, 192 );
+	sample = new WinControl( this->handler, 0, 1 );
+	sample->CreateHandler( 22, Font->ascent + 26, 256, 192 );
+	sample->Show();
+
+	int fw = Text::Width( "File:" );
 	controls.push_back(name = new Editor( this->handler ));
 	name->SetParentControl( this );
-	name->SetWidth( 300 - 44 );
-	name->MoveTo( 22, sample->Y() + sample->Height() );
+	name->SetWidth( 300 - 44 - fw - 10 );
+	name->MoveTo( 22 + fw + 10, sample->Y() + sample->Height() + 12 );
 	name->Show();
 
 	save = new Button( this->handler, 0, "Save", 80 );
 	save->SetActionControl( this );
 	save->SetParentControl( this );
 	controls.push_back( save );
-	int by = height - save->Height() - 10;
+	int by = height - save->Height() - 12;
 	cancel = new Button( this->handler, 1, "Cancel" );
 	cancel->SetActionControl( this );
 	cancel->SetParentControl( this );
@@ -57,14 +57,10 @@ void ScreenCapture::Draw()
 {
 	Dialog::Draw();
 
-	char *s[] = { "Caption:", "Command:", "Icon:" };
-	int y = Font->ascent + 20 + Font->height;
-	for( int i=0; i<SIZE_OF_ARRAY(s); i++ ) {
-		canvas->DrawText( 16, y, s[i], strlen(s[i]), CForeground );
-		y += ( Font->height + 20 );
-	}
-	y = y - Font->height + 2;
-	canvas->DrawLine( 0, y, width, y, CForeground );
+	int fw = Text::Width( "File:" ),
+		y = name->Y() + Font->ascent + 4;
+	canvas->DrawText( 22, y, "File:", 5, CForeground );
+	canvas->DrawLine( 0, y + 14, width, y + 14, CForeground );
 }
 //----------------------------------------------------------------------------
 void ScreenCapture::Appear( XEvent *e )
@@ -77,11 +73,26 @@ void ScreenCapture::Appear( XEvent *e )
 void ScreenCapture::Perform( int id )
 {
 	if( id==0 ) {
-		const char *p = name->GetText().c_str();
+		string s = name->GetText();
+		const char *p = s.c_str();
 		while( *p==' ' ) p++;
 		if( !*p ) {
 			XBell( display, 25 );
 			return;
+		}
+
+		struct stat b;
+		char *q = (char *)&p[strlen(p) - 1];
+		while( q != p && *q == ' ' ) q--;
+		*(q + 1) = 0;
+
+		if( !stat( p, &b ) ) { // File exists
+			if( S_ISDIR(b.st_mode) ) {
+				XBell( display, 25 );
+				return;
+			}
+			if( !Message::Confirm("File exists! Do you want to overwrite it?") )
+				return;
 		}
 	}
 	Dialog::Perform( id );
@@ -90,6 +101,10 @@ void ScreenCapture::Perform( int id )
 void ScreenCapture::Activate( int x, int y )
 {
 	int xx = x, yy = y;
+	ImlibImage *shot = Imlib_create_image_from_drawable( ScreenData, Root, 0,
+							0, 0, ScreenWidth, ScreenHeight );
+	Imlib_apply_image( ScreenData, shot, sample->Handler() );
+
 	if( x < 0 ) x = 0;
 	if( x + width >= ScreenWidth )
 		x = ScreenWidth - width - 1;
@@ -97,9 +112,15 @@ void ScreenCapture::Activate( int x, int y )
 	if( y + height >= ScreenHeight )
 		y = ScreenHeight - height - 1;
 	MoveTo( x, y );
-	name->SetText( "" );
+
+	string s = save_folder + "screenshot.png";
+	name->SetText( s.c_str() );
+
 	Show();
 	if( Accepted() ) {
+		save_folder = dirname( name->GetText().c_str() ) + "/";
+		Imlib_save_image( ScreenData, shot, (char *)name->GetText().c_str(), NULL );
 	}
+	Imlib_kill_image( ScreenData, shot );
 }
 //----------------------------------------------------------------------------
