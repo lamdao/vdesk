@@ -13,9 +13,9 @@ protected:
 	static bool AdaptiveText;
 	static bool HighContrast;
 	static char *HighContrastValue;
-	static bool Shadow;
-	static int ShadowX;
-	static int ShadowY;
+	static bool TextShadow;
+	static int TextShadowX;
+	static int TextShadowY;
 	static int Transparency;
 	static int DarkLevel;
 	static int DarkRatio;

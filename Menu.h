@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "Canvas.h"
 #include "Action.h"
+#include "Shadow.h"
 //-----------------------------------------------------------------------------
 #define ID_SEPARATOR	-1
 //-----------------------------------------------------------------------------
@@ -58,6 +59,7 @@ protected:
 
 	int defwidth;
 
+	Shadow *shadow;
 	static PopupMenu *CurrentMenu;
 public:
 	PopupMenu( MenuItem *item, int count );

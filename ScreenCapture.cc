@@ -21,6 +21,7 @@ ScreenCapture::ScreenCapture(): Dialog()
 
 	sample = new WinControl( this->handler, 0, 1 );
 	sample->CreateHandler( 22, Font->ascent + 26, 256, 192 );
+	sample->SetCursor( ArrowCursor );
 	sample->Show();
 
 	int fw = Text::Width( "File:" );
@@ -118,7 +119,8 @@ void ScreenCapture::Activate( int x, int y )
 
 	Show();
 	if( Accepted() ) {
-		save_folder = dirname( name->GetText().c_str() ) + "/";
+		save_folder = dirname( name->GetText().c_str() );
+		save_folder += "/";
 		Imlib_save_image( ScreenData, shot, (char *)name->GetText().c_str(), NULL );
 	}
 	Imlib_kill_image( ScreenData, shot );

@@ -16,9 +16,9 @@ bool Preferences::AdaptiveText = false;
 bool Preferences::HighContrast = false;
 char *Preferences::HighContrastValue = NULL;
 //-----------------------------------------------------------------------------
-bool Preferences::Shadow = false;
-int Preferences::ShadowX = 0;
-int Preferences::ShadowY = 0;
+bool Preferences::TextShadow = false;
+int Preferences::TextShadowX = 0;
+int Preferences::TextShadowY = 0;
 //-----------------------------------------------------------------------------
 int Preferences::Transparency = 0;
 //-----------------------------------------------------------------------------
@@ -64,9 +64,9 @@ void Preferences::Load()
 
 	FontBold = Config->QueryAsBool( "Bold" );
 	Locked = Config->QueryAsBool( "Locked" );
-	Shadow = Config->QueryAsBool( "Shadow" );
-	ShadowX = Config->QueryAsInt( "ShadowX", 1 );
-	ShadowY = Config->QueryAsInt( "ShadowY", 1 );
+	TextShadow = Config->QueryAsBool( "Shadow" );
+	TextShadowX = Config->QueryAsInt( "ShadowX", 1 );
+	TextShadowY = Config->QueryAsInt( "ShadowY", 1 );
 	SingleClick = Config->QueryAsBool( "SingleClick" );
 	Transparency = Config->QueryAsInt( "Transparency" );
 	HighContrast = Config->QueryAsBool( "HighContrast" );
@@ -97,9 +97,9 @@ void Preferences::Save()
 	
 	Config->Set( "Bold", FontBold );
 	Config->Set( "Locked", Locked );
-	Config->Set( "Shadow", Shadow );
-	Config->Set( "ShadowX", ShadowX );
-	Config->Set( "ShadowY", ShadowY );
+	Config->Set( "Shadow", TextShadow );
+	Config->Set( "ShadowX", TextShadowX );
+	Config->Set( "ShadowY", TextShadowY );
 	Config->Set( "SingleClick", SingleClick );
 	Config->Set( "Transparency", Transparency );
 	Config->Set( "AdaptiveText", AdaptiveText );
@@ -116,9 +116,9 @@ void Preferences::SetDefaultConfig()
 {
 	FontBold = false;
 	Locked = false;
-	Shadow = true;
-	ShadowX = 1;
-	ShadowY = 2;
+	TextShadow = true;
+	TextShadowX = 1;
+	TextShadowY = 2;
 	SingleClick = false;
 	Transparency = 80;
 	HighContrast = false;

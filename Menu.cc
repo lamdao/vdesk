@@ -1,7 +1,6 @@
 #include "Menu.h"
 #include "Text.h"
 #include "Desktop.h"
-#include "Shadow.h"
 //-----------------------------------------------------------------------------
 #define ID_POPUPMASK \
 	ButtonPressMask|ButtonReleaseMask|PointerMotionMask|LeaveWindowMask| \
@@ -32,12 +31,14 @@ PopupMenu::PopupMenu( MenuItem *items, int count ):
 	CreateHandler();
 	SetEventControl( this );
 	canvas = new Canvas( this->handler );
+	shadow = new Shadow();
 	current = NULL;
 	action = NULL;
 }
 //-----------------------------------------------------------------------------
 PopupMenu::~PopupMenu()
 {
+	delete shadow;
 	delete canvas;
 }
 //-----------------------------------------------------------------------------
@@ -61,7 +62,7 @@ void PopupMenu::ShowAt( int x, int y )
 
 	XMoveWindow( display, handler, this->x=x, this->y=y );
 	XMapRaised( display, handler );
-	Shadow::Instance()->Show( this );
+	shadow->Show( this );
 }
 //-----------------------------------------------------------------------------
 void PopupMenu::Hide()
@@ -69,7 +70,7 @@ void PopupMenu::Hide()
 	CurrentMenu = NULL;
 	EventControl::Release();
 	WinControl::Hide();
-	Shadow::Instance()->Hide();
+	shadow->Hide();
 }
 //-----------------------------------------------------------------------------
 void PopupMenu::Draw()

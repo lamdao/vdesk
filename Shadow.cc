@@ -1,7 +1,4 @@
 #include "Shadow.h"
-#include "Background.h"
-//-----------------------------------------------------------------------------
-Shadow *ControlShadow = NULL;
 //-----------------------------------------------------------------------------
 Shadow::Shadow(): Resource()
 {
@@ -15,13 +12,6 @@ Shadow::~Shadow()
 {
 	delete Right;
 	delete Bottom;
-}
-//-----------------------------------------------------------------------------
-Shadow *Shadow::Instance()
-{
-	if( !ControlShadow )
-		ControlShadow = new Shadow();
-	return ControlShadow;
 }
 //-----------------------------------------------------------------------------
 void Shadow::Show( WinControl *context )

@@ -1,6 +1,7 @@
 #ifndef __DIALOG_H
 #define __DIALOG_H
 //----------------------------------------------------------------------------
+#include "Shadow.h"
 #include "Window.h"
 #include "Event.h"
 #include "Action.h"
@@ -14,8 +15,11 @@ protected:
 	Canvas *canvas;
 	vector<WinControl *> controls;
 	int current;
+
+	Shadow *shadow;
 public:
 	Dialog();
+	virtual ~Dialog();
 
 	void SetTitle( string t ) { title = t; }
 

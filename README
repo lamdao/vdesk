@@ -2,7 +2,7 @@ Vdesk README
 
 Vdesk is derived from Idesk and was written by MrChuoi <mrchuoi@yahoo.com>
 - The basic idea and alot of drawing code and database structures are come
-  from Idesk (written by Chris Roberts <nikon@sc.rr.com> -
+  from Idesk (written by Chris Roberts <nikon at sc dot rr dot com> -
               http://dramamine.darktech.org/~nikon, ICQ: 63345004)
 - The idea of timer control is come from fluxbox (fluxbox.sf.net)
 
@@ -11,9 +11,9 @@ Idesk is released under the BSD license, Fluxbox is released under GPL
 license, so Vdesk must be released under GPL/BSD license :))
 
 * CREDIT:
-- Chris Roberts <nikon@sc.rr.com>
+- Chris Roberts <nikon at sc dot rr dot com>
 - All Fluxbox delvelopers (http://fluxbox.sf.net)
-- MrChuoi <mrchuoi@yahoo.com>
+- MrChuoi <mrchuoi at yahoo dot com>
 
 * INSTALL
  $ make

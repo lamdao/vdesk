@@ -33,5 +33,4 @@ config:
 
 dep:
 	$(CXX) -MM $(XFT_INC) $(IMLIB_INC) $(EXT_INC) *.cc > Makefile.dep
-	@$(MAKE)
 

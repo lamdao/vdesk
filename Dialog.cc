@@ -1,7 +1,6 @@
 #include "Dialog.h"
 #include "Text.h"
 #include "Desktop.h"
-#include "Shadow.h"
 //----------------------------------------------------------------------------
 #define ID_DIALOGMASK	ExposureMask
 //----------------------------------------------------------------------------
@@ -9,13 +8,19 @@
 //----------------------------------------------------------------------------
 Dialog::Dialog(): WinControl( Root, ID_DIALOGMASK ), EventControl()
 {
+	shadow = new Shadow();
 	SetCursor( ArrowCursor );
 	current = -1;
 }
 //-----------------------------------------------------------------------------
+Dialog::~Dialog()
+{
+	delete shadow;
+}
+//-----------------------------------------------------------------------------
 void Dialog::Show()
 {
-	Shadow::Instance()->Show( this );
+	shadow->Show( this );
 	XMapRaised( display, this->handler );
 	SetVisibled( true );
 	while( IsVisibled() ) {
@@ -23,7 +28,7 @@ void Dialog::Show()
 		XNextEvent( display, &e );
 		ProcessEvent( &e );
 	}
-	Shadow::Instance()->Hide();
+	shadow->Hide();
 }
 //-----------------------------------------------------------------------------
 void Dialog::ProcessEvent( XEvent *e )

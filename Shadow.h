@@ -14,10 +14,6 @@ public:
 
 	void Show( WinControl *context );
 	void Hide();
-
-	static Shadow *Instance();
 };
-//-----------------------------------------------------------------------------
-extern Shadow *ControlShadow;
 //-----------------------------------------------------------------------------
 #endif

@@ -108,8 +108,8 @@ void Label::Update()
 			}
 		}
 		else
-		if( Shadow ) {
-			canvas->DrawText( txt->x + ShadowX, txt->y + ShadowY,
+		if( TextShadow ) {
+			canvas->DrawText( txt->x + TextShadowX, txt->y + TextShadowY,
 							txt->data, txt->length, *scolor );
 		}
 
