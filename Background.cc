@@ -59,14 +59,15 @@ void Background::Init()
 		show = &data[0];
 		save = &data[1];
 	}
-	srand( (unsigned)time(0) );
+	srand( time(0) );
+	rand();
 }
 //----------------------------------------------------------------------------
 void Background::FreeData()
 {
 	if( source ) free( source );
-	for( int n=0; n<2; n++ ) {
-		for( int i=0; i<data[n].size(); i++ )
+	for( int n = 0; n < 2; n++ ) {
+		for( int i = 0; i < data[n].size(); i++ )
 			free( data[n][i] );
 		data[n].clear();
 	}
@@ -81,9 +82,8 @@ void Background::SwapData()
 //----------------------------------------------------------------------------
 void Background::SetDelay( int d )
 {
-	if( d>=0 && d<=60 ) {
+	if( d >= 0 && d <= 60 ) {
 		delay = d;
-		if( show->size() + save->size() <= 1 ) return;
 		if( !delay )
 			Timer::Remove( this );
 		else 
@@ -121,6 +121,7 @@ void Background::ScanSource( char *s )
 {
 	if( !s || !*s ) return;
 
+	int p, n;
 	struct stat b;
 	string path = s[0]=='~' ? HomeFolder + &s[1] : s;
 
@@ -132,11 +133,16 @@ void Background::ScanSource( char *s )
 	if( srctime == b.st_mtime ) return;
 
 	srctime = b.st_mtime;
-	if( !S_ISDIR( b.st_mode ) )
-		show->push_back( strdup( path.c_str() ) );
+	if( !S_ISDIR( b.st_mode ) ) {
+		p = images.find( "|" + path + "|" );
+		if( p < 0 ) {
+			images += "|" + path + "|";
+			show->push_back( strdup( path.c_str() ) );
+		}
+	}
 	else {
 		struct dirent **files;
-		int p, n = scandir( path.c_str(), &files, 0, 0 );
+		n = scandir( path.c_str(), &files, 0, 0 );
 		path += "/";
 
 		for( int i=0; i<n; free( files[i] ), i++ ) {
@@ -172,6 +178,11 @@ void Background::OnTime()
 void Background::ChangeImage()
 {
 	ImlibImage *si = NULL;
+
+	ScanSource( source );
+
+	if( SpareRoot && (show->size() + save->size() <= 1) )
+		return;
 
 	if( !show->size() && save->size() )
 		SwapData();
@@ -221,7 +232,5 @@ void Background::ChangeImage()
 	Imlib_apply_image( ScreenData, SpareRoot, Root );
 	Imlib_free_pixmap( ScreenData, p );
 	Imlib_kill_image( ScreenData, si );
-
-	ScanSource( source );
 }
 //----------------------------------------------------------------------------
