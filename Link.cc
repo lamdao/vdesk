@@ -148,6 +148,8 @@ void Link::SetProperties( string file, string caption, string cmd, string icon )
 	if( Caption != caption ) {
 		Caption = caption;
 		Text->SetCaption( (char *)caption.c_str() );
+		Text->MoveTo( x + (Icon->Width() - Text->Width())/2,
+			y + Icon->Height() + ICON_TEXT_SPACE );
 		r = true;
 	}
 	if( IconName != icon ) {
@@ -206,21 +208,30 @@ void Link::SetPosition( int x, int y )
 	if( y + height >= ScreenHeight )
 		y = ScreenHeight - height;
 
-	int sx = x + (Icon->Width() - Text->Width())/2;
-	Text->MoveTo( sx, y + Icon->Height() + ICON_TEXT_SPACE );
+	Text->MoveTo( x + (Icon->Width() - Text->Width())/2,
+		y + Icon->Height() + ICON_TEXT_SPACE );
 	Icon->MoveTo( x, y );
 }
 //-----------------------------------------------------------------------------
 inline bool IsExecutable( const char *f, struct stat &b, int MyUID, int MyGID )
 {
-	static char slink[4096];
-
 	if( S_ISLNK( b.st_mode ) ) {
-		int n = readlink(f, slink, sizeof(slink));
-		if( n < 0 ) return false;
+		int n, ssize = 256;
+		char *slink = NULL;
+		while( true ) {
+			slink = (char *)realloc(slink, ssize + 4);
+			n = readlink(f, slink, ssize);
+			if( n < 0 ) {
+				free(slink);
+				return false;
+			}
+			if( n < ssize ) break;
+			ssize += 256;
+		}
 		slink[n] = 0;
-		if( stat( slink, &b ) < 0 )
-			return false;
+		n = stat( slink, &b );
+		free(slink);
+		if( n < 0 ) return false;
 	}
 
 	if( !S_ISREG( b.st_mode ) )
