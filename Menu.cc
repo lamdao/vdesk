@@ -75,8 +75,8 @@ void PopupMenu::Hide()
 //-----------------------------------------------------------------------------
 void PopupMenu::Draw()
 {
-	canvas->DrawRectangle( 0, 0, width, height, CBackground );
-	canvas->DrawRectangle( 0, 0, width, Font->height+4, CBarColor );
+	canvas->DrawRectangle( 0, 0, width+2, height, CBackground );
+	canvas->DrawRectangle( 0, 0, width+2, Font->height+3, CBarColor );
 	canvas->DrawText( 9, Font->ascent + 4,
 						(char *)title.c_str(), title.length(), CForeground );
 	canvas->DrawText( 8, Font->ascent + 3,
