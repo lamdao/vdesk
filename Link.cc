@@ -320,7 +320,7 @@ void Link::MouseMove( XMotionEvent *e )
 void Link::Execute()
 {
 	if( !executable ) {
-		Message::Error( 0, "File not found or don't have permision!" );
+		Message::Error( 0, "File not found or permission denied!" );
 		return;
 	}
 
