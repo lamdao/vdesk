@@ -86,7 +86,7 @@ void Label::Update()
 {
 	Color *fcolor, *scolor;
 
-	if( reverse ) {
+	if( !HighContrast && reverse ) {
 		fcolor = &BColor;
 		scolor = &RColor;
 	}
