@@ -1,4 +1,8 @@
 * 0.0.93: (alpha 3)
+	* 2004/02/05:
+	- Threaded screenshot saving
+	- Fix bugs/cleanup some editor code
+	* 2003/XX/XX:
 	- Use constant instant of string in Database class to speed up
 	- Implement Copy/Cut/Paste (interracting with X Cut Buffer)
 	- <Enter> on edit field of dialog will issue Accept command
