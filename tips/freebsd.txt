@@ -1,0 +1,41 @@
+* Things to do to get vdesk compile on FreeBSD 5.1-current
+and running with blackbox:
+
+- install /usr/ports/graphics/imlib
+- use gmake to compile
+- cp vdesk /usr/local/bin/vdesk
+- mkdir ~/.vdesk
+- add ~/.vdesk/config:
+
+Background.Source: ~/.vdesk/backgrounds
+Background.Delay: 3
+Background.Mode: Stretch
+
+- mkdir ~/.vdesk/backgrounds
+- cp bg_image.png ~/.vdesk/backgrounds
+- add vdesk to /usr/X11R6/lib/X11/xinit:
+
+vdesk &
+blackbox
+
+- Free background/wallpaper:
+
+http://www.hebus.com
+
+
+* Here're the hints for compile vdesk on FreeBSD 4.8-stable:
+
+1- Install /usr/ports/x11-fonts/Xft
+2- Install /usr/ports/x11-toolkits/xrender (upgrade the xrender
+from the base system to newer version to pickup new functions:
+
+	XRenderFindStandardFormat
+	XRenderQuerySubpixelOrder
+
+3- Install /usr/ports/x11-fonts/fontconfig (fix the error with
+undefined reference to FT_Get_BDF_Property )
+
+In that order.
+
+--------------------
+Tran Q. Hoang
