@@ -59,7 +59,7 @@ void Background::Init()
 		show = &data[0];
 		save = &data[1];
 	}
-	srand( time(0) );
+	srand( (unsigned)time(0) );
 }
 //----------------------------------------------------------------------------
 void Background::FreeData()
