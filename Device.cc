@@ -140,7 +140,9 @@ void Device::DeleteMenu()
 //-----------------------------------------------------------------------------
 void Device::UpdateStatus()
 {
-	FILE *fp = fopen( "/proc/mounts", "r" );
+	FILE *fp = popen( "mount", "r" );
+	if( !fp ) return;
+
 	char buf[1024], *p = (char *)device.c_str();
 
 	mounted = false;
@@ -150,7 +152,7 @@ void Device::UpdateStatus()
 			break;
 		}
 	}
-	fclose( fp );
+	pclose( fp );
 }
 //-----------------------------------------------------------------------------
 void Device::SetMounted( bool m )
