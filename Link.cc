@@ -356,7 +356,7 @@ void Link::Execute()
 			}
 			if( pid == 0 ) {
 				setsid();
-				execlp("/bin/sh", "/bin/sh", "-c", Command.c_str(), NULL);
+				execlp("/bin/sh", "/bin/sh", "-c", (char *)Command.c_str(), NULL);
 
 				cerr << "Vdesk::Link::Execute( \""
 					 <<	Command.c_str() << "\" ) Failed.\n";
