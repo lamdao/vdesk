@@ -225,9 +225,9 @@ void Desktop::Perform( int id )
 //----------------------------------------------------------------------------
 void Desktop::Process()
 {
-	XGrabKey( display, XKeysymToKeycode(display, XK_Print), ControlMask, Root,
+	XGrabKey( display, XKeysymToKeycode(display, XK_Print), Mod4Mask, Root,
 				True, GrabModeAsync, GrabModeAsync );
-	XGrabButton( display, Button3, ControlMask, Root, True, ButtonReleaseMask,
+	XGrabButton( display, Button3, Mod4Mask, Root, True, ButtonReleaseMask,
 					GrabModeAsync, GrabModeAsync, None, None );
 	XSelectInput( display, Root, SubstructureNotifyMask );
 
@@ -241,10 +241,14 @@ void Desktop::Process()
 			if( c )
 				c->ProcessEvent( &e );
 			else
-			if( e.type == KeyPress /*&& e.xany.window == Root*/ ) {
-				cerr << "kc=" << ((XKeyEvent *)&e)->keycode << endl;
-				cerr <<	"ks=" << ((XKeyEvent *)&e)->state << endl;
-				//capturer->Activate( menu->X(), menu->Y() );
+			if( e.type == KeyPress && e.xany.window == Root ) {
+				int x = menu->X();
+				int y = menu->Y();
+				if( x + capturer->Width() > ScreenWidth )
+					x = ScreenWidth - capturer->Width() - 1;
+				if( y + capturer->Height() > ScreenHeight )
+					y = ScreenHeight - capturer->Height() - 1;
+				capturer->Activate( x, y );
 			}
 			else
 				Desktop::ProcessEvent( &e );

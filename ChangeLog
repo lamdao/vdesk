@@ -1,4 +1,5 @@
 * 0.0.93: (alpha 3)
+	- Replace Ctrl by Mod4 (Window key)
 	- Fixed vdesk crash when loading big apps (OO, Mozilla, Opera...)
 	- Use $LDFLAGS
 
