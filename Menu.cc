@@ -1,10 +1,13 @@
 #include "Menu.h"
 #include "Text.h"
 #include "Desktop.h"
+#include "Shadow.h"
 //-----------------------------------------------------------------------------
 #define ID_POPUPMASK \
 	ButtonPressMask|ButtonReleaseMask|PointerMotionMask|LeaveWindowMask| \
 	ExposureMask
+//-----------------------------------------------------------------------------
+PopupMenu *PopupMenu::CurrentMenu = NULL;
 //-----------------------------------------------------------------------------
 PopupMenu::PopupMenu( MenuItem *items, int count ):
 				WinControl( Root, ID_POPUPMASK ), EventControl()
@@ -48,6 +51,9 @@ void PopupMenu::SetTitle( const char *t )
 //-----------------------------------------------------------------------------
 void PopupMenu::ShowAt( int x, int y )
 {
+	if( CurrentMenu )
+		CurrentMenu->Hide();
+
 	if( x+width>=ScreenWidth )
 		x -= width;
 	if( y+height>=ScreenHeight )
@@ -55,12 +61,15 @@ void PopupMenu::ShowAt( int x, int y )
 
 	XMoveWindow( display, handler, this->x=x, this->y=y );
 	XMapRaised( display, handler );
+	Shadow::Instance()->Show( this );
 }
 //-----------------------------------------------------------------------------
 void PopupMenu::Hide()
 {
+	CurrentMenu = NULL;
 	EventControl::Release();
 	WinControl::Hide();
+	Shadow::Instance()->Hide();
 }
 //-----------------------------------------------------------------------------
 void PopupMenu::Draw()
@@ -113,6 +122,7 @@ void PopupMenu::ProcessEvent( XEvent *e )
 //-----------------------------------------------------------------------------
 void PopupMenu::Appear( XEvent *e )
 {
+	CurrentMenu = this;
 	EventControl::Grab( handler, this );
 	Draw();
 }
