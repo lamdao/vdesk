@@ -47,8 +47,12 @@ ImlibImage *Resource::BrokenIcon = NULL;
 Background *Resource::VdeskBg = NULL;
 //-----------------------------------------------------------------------------
 vector<char*> Resource::SystemPath;
+//-----------------------------------------------------------------------------
 int Resource::MyUID = -1;
 int Resource::MyGID = -1;
+//-----------------------------------------------------------------------------
+int Resource::SysKey = ControlMask;
+int Resource::SysButton = Button3;
 //-----------------------------------------------------------------------------
 Resource::Resource(): Preferences()
 {
@@ -76,6 +80,16 @@ Resource::Resource(): Preferences()
 	VdeskBg = new Background( Config->QueryAsStr( "Background.Source" ),
 								Config->QueryAsStr( "Background.Mode" ),
 								Config->QueryAsInt( "Background.Delay" ) );
+	string s = Config->Query( "SysKey" );
+	if( s == "Ctrl" )
+		SysKey = ControlMask;
+	else
+	if( s == "Alt" )
+		SysKey = Mod1Mask;
+	else
+	if( s == "Win" )
+		SysKey = Mod4Mask;
+	SysButton = Config->QueryAsInt( "SysButton", Button3 );
 
 	DefaultIconSize = Config->QueryAsInt( "DefaultIconSize", 0 );
 	if( DefaultIconSize <= 0 )
@@ -127,13 +141,13 @@ void Resource::CreateDefaultIcon()
 	if( DefaultIconSize )
 		size = DefaultIconSize;
 	else
-	if( ScreenWidth<=800 )
+	if( ScreenWidth <= 800 )
 		size = 32;
 	else
-	if( ScreenWidth<=1024 )
+	if( ScreenWidth <= 1024 )
 		size = 48;
 	else
-	if( ScreenWidth>=1600 )
+	if( ScreenWidth >= 1600 )
 		size = 100;
 	else
 		size = 64;

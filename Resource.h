@@ -43,6 +43,9 @@ protected:
 	static Window ActiveWindow;
 	static XContext VdeskCID;
 
+	static int SysKey;
+	static int SysButton;
+
 	static Cursor ArrowCursor;
 	static Cursor HandCursor;
 	static Cursor HourCursor;
