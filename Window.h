@@ -46,6 +46,7 @@ public:
 	virtual void SetActiveControl( WinControl *c ) {}
 	virtual void SetParentControl( WinControl *p ) { pctrl = p; }
 	virtual void CancelProcess() {}
+	virtual void AcceptProcess() {}
 
 	int X() const { return x; }
 	int Y() const { return y; }
