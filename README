@@ -47,6 +47,7 @@ table Config
   ShadowY: 2
   Bold: false
   SingleClick: false
+  IconPath: /path/to/icon/folder1:/path/to/icon/folder2:...
   Background.Source: ~/.vdesk/backgrounds
   Background.Delay: 3
   Background.Mode: Stretch
@@ -69,12 +70,15 @@ and ShadowY default to 1.
 "SingleClick" is a boolean (true/false). Setting it to true will allow you
 activate application with one mouse click (default is double click).
 
+"IconPath" is the path which you want vdesk to search for an icon when the icon
+doesn't have the path (See below)
+
 "Background.Source" is a path to an image of a folder containing some images
 "Background.Delay" number of minutes the background will change to new one
 "Background.Mode" display mode of an image on the background (Stretch, Tile
 or Center)
 
-Unlike Idesk, to add an icon, you just activate Vdesk's popup menu (by hold
+Unlike Idesk, to add an icon, you just activate Vdesk's popup menu (by holding
 down Ctrl key and press Right mouse button on desktop), and choose "Create
 link" item. A dialog box will show up, and you can input the information for
 a new link.
@@ -84,7 +88,7 @@ The content of a link looks like this:
 table Icon
   Caption: Home
   Command: nautilus /home/you
-  Icon: /home/you/.idesktop/home.png
+  Icon: ~/.vdesk/icons/home.png
 end
 
 If you want to have multi-line icon text, use ";" as separator for lines:
@@ -92,8 +96,11 @@ If you want to have multi-line icon text, use ";" as separator for lines:
 table Icon
   Caption: Very long;text;string
   Command: abc
-  Icon: /home/you/.idesktop/abc.png
+  Icon: abc.png
 end
+
+* NOTE: an icon without path will be searched order: ~/.vdesk/icons, ~/.vdesk,
+and all paths in IconPath field of Config table
 
 You can create a link for device as follow:
 
