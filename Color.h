@@ -16,6 +16,7 @@ public:
 	void Set( int v, const XftColor *c );
 	void Load( Table *table, char *name, char *defname=NULL );
 	void SetAlpha( int a ) { data.color.alpha = a; }
+	void Copy( const Color &c, bool reverse=false );
 	void Free();
 
 	string ConvertToString();
