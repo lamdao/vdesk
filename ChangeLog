@@ -1,4 +1,5 @@
-* 0.0.92:
+* 0.0.92: (alpha 2)
+	- Add Screen capture
 	- Add shadow for menu & dialogs
 	- Add adaptive text color
 	- Allow edit link
@@ -9,7 +10,7 @@
 	- Fixed mouse leave icon text bug
 	- Check file name/caption before save to link
 
-* 0.0.91:
+* 0.0.91: (alpha 1)
 	- Fixed some bugs
 	- Add default icon/icon path
 
