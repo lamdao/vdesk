@@ -23,10 +23,10 @@ Table::Table( ifstream &dbFile )
 	}
 } 
 //----------------------------------------------------------------------------
-void Table::Set( string l, string v )
+void Table::Set( const string &l, const string &v )
 {
 	int idx = QueryAsIndex( l );
-	if( idx>=0 )
+	if( idx >= 0 )
 		Value[idx] = v;
 	else {
 		Label.push_back( l );
@@ -35,50 +35,50 @@ void Table::Set( string l, string v )
 	}
 }
 //----------------------------------------------------------------------------
-void Table::Set( string l, int v )
+void Table::Set( const string &l, int v )
 {
 	char s[32];
 	sprintf( s, "%d", v );
 	Set( l , string(s) );
 }
 //----------------------------------------------------------------------------
-void Table::Set( string l, double v )
+void Table::Set( const string &l, double v )
 {
 	char s[32];
 	sprintf( s, "%.2f", v );
 	Set( l , string(s) );
 }
 //----------------------------------------------------------------------------
-void Table::Set( string l, bool v )
+void Table::Set( const string &l, bool v )
 {
 	Set( l , v ? string("true") : string("false") );
 }
 //----------------------------------------------------------------------------
-string Table::Query( string l )
+string Table::Query( const string &l )
 {
-	for( int i=0; i<Label.size(); i++ )
+	for( int i = 0; i < Label.size(); i++ )
 		if( Label[i] == l ) return Value[i];
 
 	return "";
 }
 //----------------------------------------------------------------------------
-int Table::QueryAsIndex( string l )
+int Table::QueryAsIndex( const string &l )
 {
-	for( int i=0; i<Label.size(); i++ )
+	for( int i = 0; i < Label.size(); i++ )
 		if( Label[i] == l ) return i;
 
 	return -1;
 }
 //----------------------------------------------------------------------------
-int Table::QueryAsInt( string l, int d )
+int Table::QueryAsInt( const string &l, int d )
 {
 	string s = Query( l );
-	if( s!="" )
+	if( s != "" )
 		return atoi( s.c_str() );
 	return d;
 }
 //----------------------------------------------------------------------------
-bool Table::QueryAsBool( string l, bool b )
+bool Table::QueryAsBool( const string &l, bool b )
 {
 	string s = Query( l );
 	if( s!="" )
@@ -86,7 +86,7 @@ bool Table::QueryAsBool( string l, bool b )
 	return b;
 }
 //----------------------------------------------------------------------------
-double Table::QueryAsFloat( string l, double f )
+double Table::QueryAsFloat( const string &l, double f )
 {
 	string s = Query( l );
 	if( s!="" )
@@ -94,17 +94,17 @@ double Table::QueryAsFloat( string l, double f )
 	return f;
 }
 //----------------------------------------------------------------------------
-char *Table::QueryAsStr( string l, char *s )
+char *Table::QueryAsStr( const string &l, char *s )
 {
-	for( int i=0; i<Label.size(); i++ )
+	for( int i = 0; i < Label.size(); i++ )
 		if( Label[i] == l ) return (char *)Value[i].c_str();
 
 	return s;
 }
 //----------------------------------------------------------------------------
-bool Table::Contains( string l )
+bool Table::Contains( const string &l )
 {
-	for( int i=0; i<Label.size(); i++ )
+	for( int i = 0; i < Label.size(); i++ )
 		if( Label[i] == l ) return true;
 
 	return false;
@@ -113,7 +113,7 @@ bool Table::Contains( string l )
 ofstream& operator << ( ofstream& os, const Table* t )
 {
 	os << "table " << t->Name << endl;
-	for( int i=0; i<t->Label.size(); i++ )
+	for( int i = 0; i < t->Label.size(); i++ )
 		os << "  " << t->Label[i] << ": " << t->Value[i] << endl;
 	os << "end\n\n";
 
@@ -122,7 +122,7 @@ ofstream& operator << ( ofstream& os, const Table* t )
 //----------------------------------------------------------------------------
 // Database
 //----------------------------------------------------------------------------
-Database::Database( string f )
+Database::Database( const string &f )
 {
 	ifstream dbFile( (File = f).c_str() );
 
@@ -137,13 +137,13 @@ Database::Database( string f )
 //----------------------------------------------------------------------------
 Database::~Database()
 {
-	for( int i=0; i<Tables.size(); i++ )
+	for( int i = 0; i < Tables.size(); i++ )
 		delete Tables[i];
 }
 //----------------------------------------------------------------------------
-Table* Database::Query( string t, bool r )
+Table* Database::Query( const string &t, bool r )
 {
-	for( int i=0; i<Tables.size(); i++ )
+	for( int i = 0; i < Tables.size(); i++ )
 		if( Tables[i]->GetName() == t ) {
 			Table *t = Tables[i];
 			if( r ) Tables.erase( Tables.begin() + i );
@@ -161,12 +161,12 @@ void Database::Add( Table *t )
 void Database::Save()
 {
 	ofstream dbFile( File.c_str() );
-	for( int i=0; i<Tables.size(); i++ )
+	for( int i = 0; i < Tables.size(); i++ )
 		dbFile << Tables[i];
 	dbFile.close();
 }
 //----------------------------------------------------------------------------
-void Database::SaveToFile( string dbf, Table *t )
+void Database::SaveToFile( const string &dbf, Table *t )
 {
 	ofstream dbFile( dbf.c_str() );
 	dbFile << t;
